@@ -1,0 +1,26 @@
+{
+  "name": "web-components",
+  "version": "0.0.1",
+  "main": "index.js",
+  "author": "lokimckay",
+  "license": "ISC",
+  "description": "",
+  "scripts": {
+    "dev": "run-p build:watch serve",
+    "build": "rollup -c",
+    "build:watch": "rollup -c -w",
+    "serve": "browser-sync start --config .bsconfig.js"
+  },
+  "devDependencies": {
+    "@babel/preset-react": "^7.14.5",
+    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.0.6",
+    "atomico": "^1.33.0",
+    "browser-sync": "^2.27.5",
+    "npm-run-all": "^4.1.5",
+    "rollup": "^2.58.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "tiny-glob": "^0.2.9"
+  }
+}
