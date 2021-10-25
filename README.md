@@ -2,10 +2,6 @@
 
 Web components designed to infiltrate no-code platforms via script tags
 
-
-
-
-
 ## Usage
 
 ```html
