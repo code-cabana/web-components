@@ -11,7 +11,9 @@
     "build:watch": "rollup -c -w",
     "serve": "browser-sync start --config .bsconfig.js",
     "test": "run-s size",
-    "size": "bundlewatch --config .bundlewatch.config.json"
+    "size": "bundlewatch --config .bundlewatch.config.json",
+    "clean": "shx rm -rf public/dist",
+    "prepare": "run-s clean build test"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
@@ -26,6 +28,7 @@
     "rollup-plugin-scss": "^3.0.0",
     "rollup-plugin-terser": "^7.0.2",
     "sass": "^1.43.3",
+    "shx": "^0.3.3",
     "tiny-glob": "^0.2.9"
   },
   "files": [

@@ -15,7 +15,7 @@ export default components.map((component) => ({
   input: `src/components/${component}/${component}.component.js`,
   output: formats.map((format) => ({
     name: component,
-    file: `public/dist/${format}/${component}.min.js`,
+    file: `public/dist/${format}/${component}.js`,
     format,
     assetFileNames: "[name][extname]",
   })),
