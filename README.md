@@ -21,7 +21,7 @@ Web components designed to infiltrate no-code platforms via script tags
 ## Features
 
 - :fire: 0 dependencies
-- :package: Small (< 10kB per component)
+- :package: Small (< 20kB per component)
 - :wheelchair: Accessible
 
 ## Tech
