@@ -1,7 +1,11 @@
 :host {
+  display: block;
+  padding: 0 16px;
+}
+
+.items {
   display: grid;
   grid-auto-flow: row;
-  padding: 0 16px;
 }
 
 .item {

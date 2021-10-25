@@ -79,7 +79,7 @@ function Accordion() {
   const valid = items.length > 0;
   return valid ? (
     <host shadowDom>
-      <div class="items">
+      <div class="items" part="items">
         {items.map((item, index) => {
           const { heading, content } = item;
           const expanded = expandedItems[index];
