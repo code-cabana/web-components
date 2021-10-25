@@ -152,20 +152,22 @@ function Accordion() {
   const valid = items.length > 0;
   return valid ? (
     <host shadowDom>
-      {items.map((item, index) => {
-        const { heading, content } = item;
-        const expanded = expandedItems[index];
-        return AccordionItem({
-          heading,
-          content,
-          icon,
-          expandedIcon,
-          expanded,
-          setExpanded: () => {
-            setExpandedItems({ ...expandedItems, [index]: !expanded });
-          },
-        });
-      })}
+      <div class="items">
+        {items.map((item, index) => {
+          const { heading, content } = item;
+          const expanded = expandedItems[index];
+          return AccordionItem({
+            heading,
+            content,
+            icon,
+            expandedIcon,
+            expanded,
+            setExpanded: () => {
+              setExpandedItems({ ...expandedItems, [index]: !expanded });
+            },
+          });
+        })}
+      </div>
       <style>{style}</style>
     </host>
   ) : (
