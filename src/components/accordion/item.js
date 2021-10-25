@@ -32,18 +32,27 @@ export default function AccordionItem({
   }
 
   return (
-    <div class={cssJoin(["item", expanded && "expanded"])}>
+    <div
+      class={cssJoin(["item", expanded && "expanded"])}
+      part={cssJoin(["item", expanded && "expanded"])}
+    >
       <button
         class="heading"
+        part="heading"
         onclick={onClick}
         aria-expanded={expanded}
         aria-haspopup={true}
       >
         {renderHtml(heading)}
-        <img class="icon" src={icon} alt="" />
-        <img class="expandedIcon" src={expandedIcon} alt="" />
+        <img class="icon" part="icon" src={icon} alt="" />
+        <img
+          class="expandedIcon"
+          part="expandedIcon"
+          src={expandedIcon}
+          alt=""
+        />
       </button>
-      <div class="content" ref={contentRef}>
+      <div class="content" part="content" ref={contentRef}>
         {renderHtml(content)}
       </div>
     </div>
