@@ -30,7 +30,8 @@
     "rollup-plugin-terser": "^7.0.2",
     "sass": "^1.43.3",
     "shx": "^0.3.3",
-    "tiny-glob": "^0.2.9"
+    "tiny-glob": "^0.2.9",
+    "xhtm": "^1.5.3"
   },
   "files": [
     "dist"

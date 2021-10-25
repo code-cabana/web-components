@@ -1,4 +1,6 @@
-import { html } from "atomico";
+import { h } from "atomico";
+import xhtm from "xhtm"
+const html = xhtm.bind(h);
 
 // Grabs the start and end elements of a component that wraps dom elements
 export function getBookends(componentName, id) {
