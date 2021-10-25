@@ -1,6 +1,6 @@
 {
   "name": "@codecabana/web-components",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "author": "lokimckay",
   "license": "ISC",
@@ -12,8 +12,9 @@
     "serve": "browser-sync start --config .bsconfig.js",
     "test": "run-s size",
     "size": "bundlewatch --config .bundlewatch.config.json",
-    "clean": "shx rm -rf public/dist",
-    "prepare": "run-s clean build test"
+    "clean": "shx rm -rf dist public/dist",
+    "pack": "shx cp -r public/dist dist",
+    "prepare": "run-s clean build test pack"
   },
   "devDependencies": {
     "@babel/preset-react": "^7.14.5",
@@ -32,7 +33,7 @@
     "tiny-glob": "^0.2.9"
   },
   "files": [
-    "public/dist"
+    "dist"
   ],
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
