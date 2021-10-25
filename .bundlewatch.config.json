@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "path": "public/dist/**/*.js",
+      "maxSize": "10kB"
+    }
+  ]
+}
