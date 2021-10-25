@@ -3,7 +3,7 @@
   "version": "0.0.3",
   "main": "index.js",
   "author": "lokimckay",
-  "license": "ISC",
+  "license": "MIT",
   "description": "Web components designed to infiltrate no-code platforms via script tags",
   "scripts": {
     "dev": "run-p build:watch serve",
