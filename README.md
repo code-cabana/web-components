@@ -1,6 +1,12 @@
 # @codecabana/web-components
 
-Web components designed for use by developers to enhance no-code platforms
+Web components designed to infiltrate no-code platforms via script tags
+
+## Features
+
+- :fire: 0 dependencies
+- :package: Small (< 10kB per component)
+- :wheelchair: Accessible
 
 ## Tech
 
