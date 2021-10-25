@@ -7,80 +7,7 @@ import {
   htmlCollectionToString,
   validateBookends,
 } from "../../lib/dom";
-
-const style = `
-:host {
-  display: grid;
-  grid-auto-flow: row;
-  padding: 0 16px;
-}
-
-.item {
-    background-color: #f5f5f5;
-    border: 1px solid #e1e1e1;
-    transition: background-color 0.2s;
-    overflow: hidden;
-  }
-
-  .heading {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    column-gap: 32px;
-    align-items: center;
-    width: 100%;
-    text-align: left;
-    border: none;
-    padding: 4px 16px;
-
-    background-color: transparent;
-    color: black;
-    cursor: pointer;
-  }
-
-  .icon,
-  .expandedIcon {
-    max-width: 32px;
-    opacity: 0.5;
-  }
-
-  .item:hover .icon,
-  .item:hover .expandedIcon {
-    opacity: 1;
-  }
-
-  .item.expanded {
-    background-color: white;
-  }
-
-  .item.expanded .icon {
-    display: none;
-  }
-  .item.expanded .content {
-    padding: 0 16px;
-    visibility: visible;
-  }
-
-  .item:not(.expanded) .expandedIcon {
-    display: none;
-  }
-
-  .item:not(.expanded) .content {
-    visibility: hidden;
-    padding: 0;
-  }
-
-  .item:first-child {
-    border-radius: 8px 8px 0 0;
-  }
-
-  .item:last-child {
-    border-radius: 0 0 8px 8px;
-  }
-
-  .item:not(:last-child) {
-    border-bottom: 0;
-  }
-`;
+import styles from "./accordion.scss";
 
 function Accordion() {
   const host = useHost();
@@ -168,7 +95,7 @@ function Accordion() {
           });
         })}
       </div>
-      <style>{style}</style>
+      <style>{styles}</style>
     </host>
   ) : (
     <div />
