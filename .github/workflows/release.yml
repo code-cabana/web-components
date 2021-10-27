@@ -31,7 +31,7 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Install Dependencies
-        run: npm ci
+        run: npm ci -f
       - name: Bump Version
         run: |
           CC_PREVIOUS_VERSION=$(node -p 'require("./lerna.json").version')
