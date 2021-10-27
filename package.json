@@ -6,7 +6,7 @@
     "dev": "lerna run dev --stream",
     "build": "lerna run build --stream",
     "clean": "lerna run clean --stream",
-    "bootstrap:ci": "lerna bootstrap -- -f",
+    "bootstrap:ci": "lerna bootstrap -- --no-optional",
     "version:ci": "lerna version -y --conventional-commits --create-release github",
     "publish:ci": "lerna publish -y from-package --no-verify-access",
     "release:local": "env-cmd run-s bootstrap version:ci publish:ci"
