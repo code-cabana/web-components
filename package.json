@@ -1,43 +1,19 @@
 {
-  "name": "@codecabana/web-components",
-  "version": "0.0.6",
-  "main": "index.js",
-  "author": "lokimckay",
-  "license": "MIT",
-  "description": "Web components designed to infiltrate no-code platforms via script tags",
+  "name": "root",
+  "private": true,
   "scripts": {
-    "dev": "run-p build:watch serve",
-    "build": "rollup -c",
-    "build:watch": "rollup -c -w",
-    "serve": "browser-sync start --config .bsconfig.js",
-    "test": "run-s size",
-    "size": "bundlewatch --config .bundlewatch.config.json",
-    "clean": "shx rm -rf dist public/dist",
-    "pack": "shx cp -r public/dist dist",
-    "prepare": "run-s clean build test pack"
+    "bootstrap": "lerna bootstrap",
+    "dev": "lerna run dev --stream",
+    "build": "lerna run build --stream",
+    "clean": "lerna run clean --stream",
+    "publish:ci": "lerna publish -y from-package --no-verify-access",
+    "version:ci": "lerna version -y --conventional-commits --create-release github",
+    "release:ci": "run-s bootstrap version:ci publish:ci",
+    "release:local": "env-cmd run-s bootstrap version:ci publish:ci"
   },
   "devDependencies": {
-    "@babel/preset-react": "^7.14.5",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-commonjs": "^21.0.1",
-    "@rollup/plugin-node-resolve": "^13.0.6",
-    "atomico": "^1.33.0",
-    "browser-sync": "^2.27.5",
-    "bundlewatch": "^0.3.2",
-    "npm-run-all": "^4.1.5",
-    "rollup": "^2.58.0",
-    "rollup-plugin-scss": "^3.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "sass": "^1.43.3",
-    "shx": "^0.3.3",
-    "tiny-glob": "^0.2.9",
-    "xhtm": "^1.5.3"
-  },
-  "files": [
-    "dist"
-  ],
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/",
-    "access": "public"
+    "env-cmd": "^10.1.0",
+    "lerna": "^3.22.1",
+    "npm-run-all": "^4.1.5"
   }
 }
