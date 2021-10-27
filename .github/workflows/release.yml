@@ -46,7 +46,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Bootstrap
-        run: npm run bootstrap:ci
+        run: npm run bootstrap
       - name: Publish
         run: npm run publish:ci
         env:
