@@ -1,4 +1,4 @@
-# CC &middot; Web Components &middot; [![npm version](https://img.shields.io/npm/v/@codecabana/web-components?color=bright-green)](https://www.npmjs.com/package/@codecabana/web-components) [![unpkg](https://img.shields.io/badge/unpkg-browse-blue)](https://unpkg.com/browse/@codecabana/web-components@latest/) ![npm license](https://img.shields.io/npm/l/@codecabana/web-components)
+# CC &middot; Web Components &middot; [![npm version](https://img.shields.io/npm/v/@codecabana/web-components?color=bright-green)](https://www.npmjs.com/package/@codecabana/web-components) [![unpkg](https://img.shields.io/badge/unpkg-browse-blue)](https://unpkg.com/browse/@codecabana/web-components@latest/) ![npm license](https://img.shields.io/npm/l/@codecabana/web-components?color=blue)
 
 Web components designed to infiltrate no-code platforms via script tags
 
