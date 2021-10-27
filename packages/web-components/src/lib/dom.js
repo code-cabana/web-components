@@ -1,11 +1,12 @@
+import { error } from "./logger";
 import { h } from "atomico";
-import xhtm from "xhtm"
+import xhtm from "xhtm";
 const html = xhtm.bind(h);
 
 // Grabs the start and end elements of a component that wraps dom elements
 export function getBookends(componentName, id) {
   const bookends = document.querySelectorAll(
-    `codecabana-${componentName}${id ? `#${id}` : ""}`
+    `codecabana-${componentName}${id ? `#${id}` : ":not([id])"}`
   );
   return bookends;
 }
@@ -15,7 +16,7 @@ export function validateBookends(bookends, id) {
   if (!bookends || bookends.length < 1) return false;
 
   if (bookends.length === 1) {
-    console.error(
+    error(
       `[CC] Accordion ${
         id ? `with id: "${id}" ` : ""
       }does not have a matching beginning/end`
@@ -24,7 +25,7 @@ export function validateBookends(bookends, id) {
   }
 
   if (bookends.length > 2) {
-    console.error(
+    error(
       `[CC] Too many accordions${
         id ? ` with the same id: "${id}"` : ""
       }. Only one start & end per id is allowed. To add more accordions, specify an id. E.g: <codecabana-accordion id="accordion1"></codecabana-accordion>`
@@ -50,7 +51,7 @@ export function htmlCollectionToString(collection) {
     .map((el) => el.outerHTML)
     .join("");
 }
-// Render an HTML string using atomico
+// Render an HTML string using xhtm
 export function renderHtml(htmlString) {
   return html([htmlString]);
 }

@@ -1,17 +1,21 @@
-import Head from "next/head";
 import { getComponentList } from "../../lib/data";
+import { renderHtml } from "../../lib/dom";
+import getSnippet from "../../snippets";
+import Script from "next/script";
+import Head from "next/head";
 
-export default function Component({ name, Element }) {
+export default function Component({ name }) {
+  const snippet = getSnippet(name);
   return (
     <div>
       <Head>
         <title>Code Cabana | {name}</title>
-        <script type="module" src={`/dist/es/${name}.js`}></script>
       </Head>
 
       <main>
         <h1>{name}</h1>
-        <Element></Element>
+        {snippet && renderHtml(snippet)}
+        <Script type="module" src={`/dist/es/${name}.js`} />
       </main>
     </div>
   );

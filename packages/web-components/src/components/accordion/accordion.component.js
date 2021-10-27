@@ -67,13 +67,9 @@ function Accordion() {
   }
 
   useEffect(() => {
-    document.addEventListener("DOMContentLoaded", () => {
-      init();
-    });
-
-    document.addEventListener("pageChange", () => {
-      init();
-    });
+    init();
+    document.addEventListener("DOMContentLoaded", () => init);
+    document.addEventListener("pageChange", () => init);
   }, []);
 
   const valid = items.length > 0;
@@ -106,7 +102,6 @@ Accordion.props = {
   id: {
     type: String,
     reflect: true,
-    value: "accordion",
   },
   debug: {
     type: Boolean,
@@ -115,12 +110,12 @@ Accordion.props = {
   },
   icon: {
     type: String,
-    reflect: true,
+    reflect: false,
     value: "https://img.icons8.com/ios-glyphs/452/chevron-right.png",
   },
   expandedIcon: {
     type: String,
-    reflect: true,
+    reflect: false,
     value: "https://img.icons8.com/ios-glyphs/452/chevron-down.png",
   },
 };

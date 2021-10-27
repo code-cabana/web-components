@@ -1,4 +1,5 @@
 {
+  "name": "demo",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -7,14 +8,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "html-react-parser": "^1.4.0",
     "next": "12.0.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "tiny-glob": "^0.2.9"
+    "tiny-glob": "^0.2.9",
+    "xhtm": "^1.5.3"
   },
   "devDependencies": {
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.1",
+    "html-loader": "^3.0.0",
     "serve": "12.0.1"
   }
 }
