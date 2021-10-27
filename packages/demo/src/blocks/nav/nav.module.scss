@@ -1,0 +1,11 @@
+.nav {
+  display: inline-grid;
+  grid-auto-flow: column;
+  justify-items: end;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+}
