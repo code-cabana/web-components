@@ -8,33 +8,33 @@ jobs:
     name: Release
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: 📦 Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Node.js
+      - name: 📦 Setup Node.js
         uses: actions/setup-node@v2
         with:
           node-version: "14"
-      - name: Upgrade NPM # https://github.com/bahmutov/npm-install/issues/103#issuecomment-931226602
+      - name: 🔼 Upgrade NPM # https://github.com/bahmutov/npm-install/issues/103#issuecomment-931226602
         run: npm install -g npm
-      - name: Git Identity
+      - name: 🛂 Git Identity
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/$GITHUB_REPOSITORY
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: NPM Auth
+      - name: 🛂 NPM Auth
         run: |
           echo "registry=https://registry.npmjs.org/" > .npmrc
           echo "//registry.npmjs.org/:_authToken=$NPM_TOKEN" >> .npmrc
           npm whoami
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Install Dependencies
+      - name: 📦 Install Dependencies
         run: npm ci
-      - name: Bump Version
+      - name: 🔼 Bump Version
         run: |
           CC_PREVIOUS_VERSION=$(node -p 'require("./lerna.json").version')
           echo "CC_PREVIOUS_VERSION=${CC_PREVIOUS_VERSION}" >> $GITHUB_ENV
@@ -45,12 +45,12 @@ jobs:
           echo "New version is: ${CC_NEW_VERSION}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Bootstrap
+      - name: 📦 Bootstrap
         run: npm run bootstrap
-      - name: Publish
+      - name: 🎉 Publish
         run: npm run publish:ci
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-      - name: Logs
+      - name: 📃 Logs
         if: ${{ failure() }}
         run: cat lerna-debug.log
