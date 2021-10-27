@@ -8,7 +8,6 @@
     "clean": "lerna run clean --stream",
     "publish:ci": "lerna publish -y from-package --no-verify-access",
     "version:ci": "lerna version -y --conventional-commits --create-release github",
-    "release:ci": "run-s bootstrap version:ci publish:ci",
     "release:local": "env-cmd run-s bootstrap version:ci publish:ci"
   },
   "devDependencies": {

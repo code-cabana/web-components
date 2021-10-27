@@ -2,6 +2,10 @@
 
 Web components designed to infiltrate no-code platforms via script tags
 
+- :fire: 0 dependencies
+- :package: Small (< 20kB per component)
+- :wheelchair: Accessible
+
 ## Usage
 
 ```html
@@ -18,11 +22,11 @@ Web components designed to infiltrate no-code platforms via script tags
 ></script>
 ```
 
-## Features
+## Publishing
 
-- :fire: 0 dependencies
-- :package: Small (< 20kB per component)
-- :wheelchair: Accessible
+Any push to master branch will trigger the publish process via [Github Actions](https://docs.github.com/en/actions)
+
+Version is incremented [semantically](https://semver.org/) using the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) specification
 
 ## Tech
 
