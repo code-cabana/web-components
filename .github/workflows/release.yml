@@ -16,6 +16,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "14"
+      - name: Upgrade NPM # https://github.com/bahmutov/npm-install/issues/103#issuecomment-931226602
+        run: npm install -g npm
       - name: Git Identity
         run: |
           git config --global user.name 'github-actions[bot]'
