@@ -1,4 +1,6 @@
-// https://github.com/rsdavis/svelte-collapse
+// Based on https://github.com/rsdavis/svelte-collapse
+import { nextFrame } from "./index";
+
 export default function collapse(node, params) {
   const defaultParams = {
     open: true,
@@ -24,10 +26,6 @@ export default function collapse(node, params) {
       transitionEndResolve = resolve;
       transitionEndReject = reject;
     });
-  }
-
-  async function nextFrame() {
-    return new Promise(requestAnimationFrame);
   }
 
   function transition() {

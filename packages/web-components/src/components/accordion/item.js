@@ -1,6 +1,6 @@
 import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
-import collapse from "../../lib/collapse";
+import { collapse } from "../../lib/animation";
 import { useEffect, useRef, useState } from "atomico/core";
 
 export default function AccordionItem({
