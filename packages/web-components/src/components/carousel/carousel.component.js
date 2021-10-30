@@ -102,12 +102,16 @@ function Carousel() {
       onblur={() => setFocused(false)}
       onkeydown={onKeyDown}
     >
-      <div class="container">
-        <div class={cssJoin(["overlay", focused && "focused"])} />
+      <div class="container" part="container">
+        <div
+          class={cssJoin(["overlay", focused && "focused"])}
+          part="overlay"
+        />
         <div
           class="track transition"
-          ontransitionend={onTransitionEnd}
+          part="slides"
           ref={trackRef}
+          ontransitionend={onTransitionEnd}
           style={{ "--activeSlide": activeSlide }}
         >
           <slot name="slide" ref={slotRef} style="display: none;"></slot>

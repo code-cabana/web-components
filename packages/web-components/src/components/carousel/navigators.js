@@ -8,7 +8,7 @@ export default function Navigators({
   atEnd,
 }) {
   return (
-    <div className="navigators">
+    <div className="navigators" part="navigators">
       <button
         tabindex={-1}
         onclick={() => {
@@ -19,6 +19,7 @@ export default function Navigators({
           flipnav && "flip",
           atStart && "disabled",
         ])}
+        part="previous navigator"
       >
         <img alt="previous" src={icon} />
       </button>
@@ -28,6 +29,7 @@ export default function Navigators({
           adjustActiveSlide(1);
         }}
         className={cssJoin(["next", !flipnav && "flip", atEnd && "disabled"])}
+        part="next navigator"
       >
         <img alt="next" src={icon} />
       </button>
