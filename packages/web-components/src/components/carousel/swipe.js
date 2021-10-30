@@ -1,167 +1,152 @@
-class Swipe {
-  constructor(elem, options = {}) {
-    this.elem = elem;
-    this.minDistance = options.minDistance || 100;
-    this.maxTime = options.maxTime || 500;
-    this.corners = options.corners || false;
-    this.addListeners();
-    this.events = {
-      live: [],
-      after: [],
-    };
-    Swipe.directions().forEach((direction) => (this.events[direction] = []));
+import { useEffect, useRef, useState } from "atomico/core";
+
+// Detects touch and mouse swipe movement and executes a callback function
+// onSwiping ({ direction, distance })
+// onSwipeEnd ({ direction, distance })
+export default function useSwipe({
+  minDistance = 100,
+  maxTime = 500,
+  corners = false,
+  onSwiping,
+  onSwipeEnd,
+} = {}) {
+  const node = useRef();
+  const [held, setHeld] = useState(false);
+  const [swiping, setSwiping] = useState(false);
+  const [swipeStartPos, setSwipeStartPos] = useState();
+  const [swipeStartTime, setSwipeStartTime] = useState();
+  // let { current: held } = useRef(_held) || {};
+
+  // function setHeld(newState) {
+  //   held = newState;
+  //   _setHeld(newState);
+  // }
+
+  // Returns X/Y coordinates of an event
+  function getPosition(event) {
+    const { pageX: x, pageY: y } = event || {};
+    return { x, y };
   }
 
-  static directions() {
-    return [
-      "left",
-      "right",
-      "up",
-      "down",
-      "leftup",
-      "leftdown",
-      "rightup",
-      "rightdown",
-    ];
-  }
-
-  static position(e) {
-    return { x: e.pageX, y: e.pageY };
-  }
-
-  static getOffsets(e, startPos) {
-    const newPos = Swipe.position(e);
+  // Returns distance between two positions
+  function getDelta(startPos, endPos) {
     return {
-      x: newPos.x - startPos.x,
-      y: newPos.y - startPos.y,
+      x: endPos.x - startPos.x,
+      y: endPos.y - startPos.y,
     };
   }
 
-  static getDirections(offsets, corners) {
-    const directions = {};
-    directions.left = offsets.x <= 0 ? Math.abs(offsets.x) : 0;
-    directions.right = offsets.x >= 0 ? Math.abs(offsets.x) : 0;
-    directions.up = offsets.y <= 0 ? Math.abs(offsets.y) : 0;
-    directions.down = offsets.y >= 0 ? Math.abs(offsets.y) : 0;
-
-    if (corners) {
-      directions.leftup = Math.abs(directions.left + directions.up) / 1.5;
-      directions.leftdown = Math.abs(directions.left + directions.down) / 1.5;
-      directions.rightup = Math.abs(directions.right + directions.up) / 1.5;
-      directions.rightdown = Math.abs(directions.right + directions.down) / 1.5;
-    }
-
-    return directions;
+  // Converts a delta value to compass directions
+  function getDirections(delta, corners) {
+    const cardinal = {
+      left: delta.x <= 0 ? Math.abs(delta.x) : 0,
+      right: delta.x >= 0 ? Math.abs(delta.x) : 0,
+      up: delta.y <= 0 ? Math.abs(delta.y) : 0,
+      down: delta.y >= 0 ? Math.abs(delta.y) : 0,
+    };
+    const ordinal = {
+      leftup: Math.abs(cardinal.left + cardinal.up) / 1.5,
+      leftdown: Math.abs(cardinal.left + cardinal.down) / 1.5,
+      rightup: Math.abs(cardinal.right + cardinal.up) / 1.5,
+      rightdown: Math.abs(cardinal.right + cardinal.down) / 1.5,
+    };
+    return corners ? { ...cardinal, ...ordinal } : cardinal;
   }
 
-  static order(directions) {
+  // Sorts directional influences from largest to smallest
+  function sort(directions) {
     return Object.keys(directions).sort(
       (a, b) => directions[b] - directions[a]
     );
   }
 
-  addEventListener(evt, bc) {
-    const keys = Object.keys(this.events);
-    if (keys.indexOf(evt) !== -1) {
-      this.events[evt].push(bc);
-      const i = this.events.length - 1;
-      return {
-        clear: () => {
-          this.events[i] = undefined;
-        },
-      };
-    } else {
-      throw new Error("Event is not valid, use " + keys.join(", "));
-    }
+  // Returns direction and distance between two points
+  function getDirAndDist(startPos, endPos) {
+    const delta = getDelta(startPos, endPos);
+    const directions = getDirections(delta, corners);
+    const direction = sort(directions)[0];
+    const distance = directions[direction];
+
+    return { direction, distance };
   }
 
-  down(e) {
-    e.preventDefault();
-    this.didDown = true;
-    this.startTime = Date.now();
-    this.startPos = Swipe.position(e);
+  function onDown(event) {
+    event.preventDefault();
+    console.log("DOWN");
+    setHeld(true);
+    setSwipeStartPos(getPosition(event));
+    setSwipeStartTime(Date.now());
   }
 
-  move(e) {
-    e.preventDefault();
-    if (!this.didDown) {
-      return;
-    }
-    this.didSwipe = true;
+  function onMove(event) {
+    event.preventDefault();
+    console.log("MOVE", held);
+    if (!held) return;
+    setSwiping(true);
 
-    if (this.events.live.length > 0) {
-      const offsets = Swipe.getOffsets(e, this.startPos);
-      const directions = Swipe.getDirections(offsets, this.corners);
-      const direction = Swipe.order(directions)[0];
-      const distance = directions[direction];
-      this.events.live.forEach((evt) => {
-        if (typeof evt === "function") {
-          evt(direction, distance);
-        }
-      });
-    }
-  }
-
-  up(e) {
-    e.preventDefault();
-    this.didDown = false;
-    if (!this.didSwipe) {
-      return;
-    }
-    this.didSwipe = false;
-
-    const elapsedTime = Date.now() - this.startTime;
-    if (elapsedTime <= this.maxTime) {
-      const offsets = Swipe.getOffsets(e, this.startPos);
-      const directions = Swipe.getDirections(offsets, this.corners);
-      const direction = Swipe.order(directions)[0];
-      const distance = directions[direction];
-
-      if (distance >= this.minDistance) {
-        this.events.after.forEach((evt) => {
-          if (typeof evt === "function") {
-            evt(direction, distance);
-          }
-        });
-        this.events[direction].forEach((evt) => {
-          if (typeof evt === "function") {
-            evt(distance);
-          }
-        });
+    if (typeof onSwiping === "function") {
+      const currentPos = getPosition(event);
+      const { direction, distance } = getDirAndDist(swipeStartPos, currentPos);
+      if (distance >= minDistance) {
+        onSwiping({ direction, distance });
       }
     }
   }
 
-  addListeners() {
-    this.elem.addEventListener("touchstart", (e) => this.down(e));
-    this.elem.addEventListener("mousedown", (e) => this.down(e));
-    this.elem.addEventListener("touchmove", (e) => this.move(e));
-    document.addEventListener("mousemove", (e) => this.move(e));
-    this.elem.addEventListener("touchend", (e) => this.up(e));
-    document.addEventListener("mouseup", (e) => this.up(e));
+  function onUp(event) {
+    event.preventDefault();
+    console.log("UP");
+    setHeld(false);
+    if (!swiping) return;
+    setSwiping(false);
+
+    const elapsedTime = Date.now() - swipeStartTime;
+    if (elapsedTime <= maxTime) {
+      const swipeEndPos = getPosition(event);
+      const { direction, distance } = getDirAndDist(swipeStartPos, swipeEndPos);
+      if (distance >= minDistance) {
+        if (typeof onSwipeEnd === "function")
+          onSwipeEnd({ direction, distance });
+      }
+    }
   }
+
+  useEffect(() => {
+    if (!node || !node.current) return;
+    console.log("INIT");
+    // node.current.addEventListener("touchstart", (event) => onDown(event));
+    // node.current.addEventListener("touchend", (event) => onUp(event));
+    // node.current.addEventListener("touchmove", (event) => onMove(event));
+    // node.current.addEventListener("mousedown", (event) => onDown(event));
+    // document.addEventListener("mouseup", (event) => onUp(event));
+    // document.addEventListener("mousemove", (event) => onMove(event));
+    console.log(node.current);
+    node.current.ontouchstart = onDown;
+    node.current.ontouchend = onUp;
+    node.current.ontouchmove = onMove;
+    node.current.onmousedown = onDown;
+    document.onmouseup = onUp;
+    document.onmousemove = onMove;
+    return () => {
+      // node.current.removeEventListener("touchstart", (event) => onDown(event));
+      // node.current.removeEventListener("touchend", (event) => onUp(event));
+      // node.current.removeEventListener("touchmove", (event) => onMove(event));
+      // node.current.removeEventListener("mousedown", (event) => onDown(event));
+      // document.removeEventListener("mouseup", (event) => onUp(event));
+      // document.removeEventListener("mousemove", (event) => onMove(event));
+      node.current.ontouchstart = undefined;
+      node.current.ontouchend = undefined;
+      node.current.ontouchmove = undefined;
+      node.current.onmousedown = undefined;
+      document.onmouseup = undefined;
+      document.onmousemove = undefined;
+    };
+  }, [node]);
+
+  return node;
 }
 
-//CODE FOR ANIMATION
-const box = document.querySelector(".box");
-const classes = Swipe.directions();
-const elem = box.firstChild;
+// UP TO: event handlers only have access to initial state - need to find way to preserve state across calls
+// maybe just re-register?
 
-const runAnimation = (direction) => {
-  elem.innerHTML = direction;
-  elem.classList.remove.apply(elem.classList, classes);
-  setTimeout(() => elem.classList.add(direction), 1);
-};
-
-//SWIPE INITIALIZATION
-const swipe = new Swipe(box, {
-  corners: true,
-  minDistance: 50,
-});
-let afterEvent = swipe.addEventListener("after", (direction) => {
-  runAnimation(direction);
-});
-let liveEvent = swipe.addEventListener("live", (direction) => {
-  elem.innerHTML = direction;
-});
-//REMOVE EVENT WITH evt.clear();
+// helpful : https://stackoverflow.com/questions/53845595/wrong-react-hooks-behaviour-with-event-listener

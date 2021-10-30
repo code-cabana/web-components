@@ -4,11 +4,17 @@ import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
 import { nextFrame } from "../../lib/animation";
 import Navigators from "./navigators";
+import useSwipe from "./swipe";
 import styles from "./carousel.scss";
 
 function Carousel() {
   const slotRef = useRef();
   const trackRef = useRef();
+  const swipeRef = useSwipe({
+    onSwiping: ({ direction, distance }) => {
+      console.log(direction, distance);
+    },
+  });
   const childNodes = useSlot(slotRef);
   const [loop] = useProp("loop");
   const [icon] = useProp("icon");
@@ -102,7 +108,8 @@ function Carousel() {
       onblur={() => setFocused(false)}
       onkeydown={onKeyDown}
     >
-      <div class="container" part="container">
+      <div ref={swipeRef}>hi</div>
+      {/* <div class="container" part="container">
         <div
           class={cssJoin(["overlay", focused && "focused"])}
           part="overlay"
@@ -118,7 +125,7 @@ function Carousel() {
           {slides}
         </div>
         {Navigators({ adjustActiveSlide, icon, flipnav, atStart, atEnd })}
-      </div>
+      </div> */}
       <style>{styles}</style>
     </host>
   );
