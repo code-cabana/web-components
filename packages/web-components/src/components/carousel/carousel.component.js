@@ -3,6 +3,7 @@ import { useSlot } from "@atomico/hooks/use-slot";
 import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
 import { nextFrame } from "../../lib/animation";
+import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
 function Carousel() {
@@ -10,6 +11,7 @@ function Carousel() {
   const trackRef = useRef();
   const childNodes = useSlot(slotRef);
   const [loop] = useProp("loop");
+  const [icon] = useProp("icon");
   const [duration] = useProp("duration");
   const [focused, setFocused] = useState(false);
   const [activeSlide, setActiveSlide] = useState(loop ? 1 : 0);
@@ -24,7 +26,7 @@ function Carousel() {
 
   const slides = loopedChildren
     .filter((el) => el instanceof Element)
-    .map((child) => renderHtml(child.outerHTML));
+    .map((child) => renderHtml(child.cloneNode(true).outerHTML));
 
   const numSlides = slides.length;
   const lastSlide = numSlides - 1;
@@ -78,30 +80,18 @@ function Carousel() {
       onblur={() => setFocused(false)}
       onkeydown={onKeyDown}
     >
-      <slot name="slide" ref={slotRef} style="display: none;"></slot>
-      <div class={cssJoin(["container", focused && "focused"])}>
+      <div class="container">
+        <div class={cssJoin(["overlay", focused && "focused"])} />
         <div
           class="track transition"
           ontransitionend={onTransitionEnd}
           ref={trackRef}
           style={{ "--activeSlide": activeSlide }}
         >
+          <slot name="slide" ref={slotRef} style="display: none;"></slot>
           {slides}
         </div>
-        <button
-          onclick={() => {
-            adjustActiveSlide(-1);
-          }}
-        >
-          Previous
-        </button>
-        <button
-          onclick={() => {
-            adjustActiveSlide(1);
-          }}
-        >
-          Next
-        </button>
+        {Navigators({ adjustActiveSlide, icon })}
       </div>
       <style>{styles}</style>
     </host>

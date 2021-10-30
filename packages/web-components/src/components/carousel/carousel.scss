@@ -4,6 +4,14 @@
   width: var(--width, auto);
   height: var(--height, auto);
   background: var(--background, #3b3636);
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
   transition: box-shadow 0.3s;
 
   &.focused {
@@ -27,12 +35,61 @@
 }
 
 // Slides
+.track *[slot="slide"],
 ::slotted(*) {
   box-sizing: border-box;
   display: inline-block;
   width: var(--slideWidth, 100%);
   height: 100%;
   object-fit: cover;
+}
+
+.navigators {
+  display: inline-grid;
+  grid-auto-flow: column;
+  justify-content: space-between;
+  align-items: var(--iconAlign, center);
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  padding: var(--iconInset, 1%);
+  pointer-events: none;
+  z-index: 2;
+
+  button {
+    cursor: pointer;
+    pointer-events: all;
+    background-color: transparent;
+    border: none;
+
+    $maxWidth: var(--iconWidth, 96px);
+    width: 15vw;
+    max-width: $maxWidth;
+    padding: var(--iconPadding, 16px);
+    transition: width 0.1s, max-width 0.1s;
+
+    img {
+      max-width: 100%;
+    }
+
+    &.disabled {
+      width: calc(#{$maxWidth} / 2);
+      opacity: 0.5;
+      cursor: auto;
+    }
+
+    &:hover:not(.disabled) {
+      $enlargedWidth: calc(#{$maxWidth} * 1.15);
+      width: $enlargedWidth;
+      max-width: $enlargedWidth;
+    }
+
+    &.next {
+      justify-self: end;
+    }
+  }
 }
 
 .flip {
