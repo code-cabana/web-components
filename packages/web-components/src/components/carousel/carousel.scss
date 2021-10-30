@@ -1,9 +1,7 @@
 .container {
   position: relative;
   overflow: hidden;
-  width: var(--width, auto);
-  height: var(--height, auto);
-  background: var(--background, #3b3636);
+  background: #3b3636;
 }
 
 .overlay {
@@ -15,7 +13,7 @@
   transition: box-shadow 0.3s;
 
   &.focused {
-    box-shadow: 0 0 5px 5px var(--focusColor, #a0a0a0) inset;
+    box-shadow: 0 0 5px 5px #a0a0a0 inset;
   }
 }
 
@@ -25,9 +23,7 @@
   height: 100%;
   align-items: center;
   grid-template-columns: repeat(var(--numSlides, 1), 100%);
-  transform: translateX(
-    calc(-1 * var(--activeSlide) * var(--moveAmount, 100%))
-  );
+  transform: translateX(calc(-1 * var(--activeSlide) * 100%));
 
   &.transition {
     transition: transform var(--duration, 0.3s);
@@ -39,7 +35,7 @@
 ::slotted(*) {
   box-sizing: border-box;
   display: inline-block;
-  width: var(--slideWidth, 100%);
+  width: 100%;
   height: 100%;
   object-fit: cover;
 }
@@ -48,13 +44,13 @@
   display: inline-grid;
   grid-auto-flow: column;
   justify-content: space-between;
-  align-items: var(--iconAlign, center);
+  align-items: center;
   box-sizing: border-box;
   position: absolute;
   top: 0;
   bottom: 0;
   width: 100%;
-  padding: var(--iconInset, 1%);
+  padding: 1%;
   pointer-events: none;
   z-index: 2;
 
@@ -64,10 +60,10 @@
     background-color: transparent;
     border: none;
 
-    $maxWidth: var(--iconWidth, 96px);
+    $maxWidth: 96px;
     width: 15vw;
     max-width: $maxWidth;
-    padding: var(--iconPadding, 16px);
+    padding: 16px;
     transition: width 0.1s, max-width 0.1s;
 
     img {
@@ -75,7 +71,7 @@
     }
 
     &.disabled {
-      width: calc(#{$maxWidth} / 2);
+      width: calc(#{$maxWidth} / 1.25);
       opacity: 0.5;
       cursor: auto;
     }

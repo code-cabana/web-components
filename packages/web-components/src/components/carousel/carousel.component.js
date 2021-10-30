@@ -1,4 +1,4 @@
-import { c, useProp, useRef, useState } from "atomico";
+import { c, useEffect, useProp, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
@@ -12,7 +12,12 @@ function Carousel() {
   const childNodes = useSlot(slotRef);
   const [loop] = useProp("loop");
   const [icon] = useProp("icon");
+  const [autoplay] = useProp("autoplay");
   const [duration] = useProp("duration");
+  const [direction] = useProp("direction");
+  const [interval] = useProp("interval");
+  const [pauseonfocus] = useProp("pauseonfocus");
+  const [flipnav] = useProp("flipnav");
   const [focused, setFocused] = useState(false);
   const [activeSlide, setActiveSlide] = useState(loop ? 1 : 0);
 
@@ -32,6 +37,8 @@ function Carousel() {
   const lastSlide = numSlides - 1;
   const loopStart = 1;
   const loopEnd = lastSlide - 1;
+  const atStart = !loop && activeSlide === 0;
+  const atEnd = !loop && activeSlide === lastSlide;
 
   function goToSlide(index) {
     const newIndex = Math.min(lastSlide, Math.max(0, index));
@@ -71,11 +78,26 @@ function Carousel() {
     trackRef.current.style.transition = transitionStyle;
   }
 
+  // Initialize autoplay
+  useEffect(() => {
+    if (!autoplay || numSlides <= 0) return;
+    const autoplayTimeoutRef = setTimeout(() => {
+      if (pauseonfocus && focused) return;
+      if (direction === "left") adjustActiveSlide(-1);
+      else adjustActiveSlide(1);
+    }, interval);
+
+    return () => clearTimeout(autoplayTimeoutRef);
+  }, [activeSlide, numSlides, focused]);
+
   return (
     <host
       shadowDom
       tabindex={0}
-      style={{ "--numSlides": numSlides, "--duration": `${duration}s` }}
+      style={{
+        "--numSlides": numSlides,
+        "--duration": `${duration}s`,
+      }}
       onfocus={() => setFocused(true)}
       onblur={() => setFocused(false)}
       onkeydown={onKeyDown}
@@ -91,7 +113,7 @@ function Carousel() {
           <slot name="slide" ref={slotRef} style="display: none;"></slot>
           {slides}
         </div>
-        {Navigators({ adjustActiveSlide, icon })}
+        {Navigators({ adjustActiveSlide, icon, flipnav, atStart, atEnd })}
       </div>
       <style>{styles}</style>
     </host>
@@ -124,6 +146,11 @@ Carousel.props = {
     reflect: false,
     value: 0.3,
   },
+  pauseonfocus: {
+    type: Boolean,
+    reflect: false,
+    value: true,
+  },
   draggable: {
     type: Boolean,
     reflect: false,
@@ -134,7 +161,7 @@ Carousel.props = {
     reflect: false,
     value: "https://codecabana.com.au/pkg/@latest/img/arrow.png",
   },
-  flipIcons: {
+  flipnav: {
     type: Boolean,
     reflect: false,
     value: false,
