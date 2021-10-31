@@ -3,16 +3,19 @@ import { useSlot } from "@atomico/hooks/use-slot";
 import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
 import { nextFrame } from "../../lib/animation";
+import { useSwipe } from "../../lib/hooks";
 import Navigators from "./navigators";
-import useSwipe from "./swipe";
 import styles from "./carousel.scss";
 
 function Carousel() {
   const slotRef = useRef();
-  const trackRef = useRef();
-  const swipeRef = useSwipe({
+  const trackRef = useSwipe({
     onSwiping: ({ direction, distance }) => {
-      console.log(direction, distance);
+      //console.log(direction, distance);
+    },
+    onSwipeEnd: ({ direction, distance }) => {
+      if (direction === "left") adjustActiveSlide(1);
+      if (direction === "right") adjustActiveSlide(-1);
     },
   });
   const childNodes = useSlot(slotRef);
@@ -108,8 +111,7 @@ function Carousel() {
       onblur={() => setFocused(false)}
       onkeydown={onKeyDown}
     >
-      <div ref={swipeRef}>hi</div>
-      {/* <div class="container" part="container">
+      <div class="container" part="container">
         <div
           class={cssJoin(["overlay", focused && "focused"])}
           part="overlay"
@@ -125,7 +127,7 @@ function Carousel() {
           {slides}
         </div>
         {Navigators({ adjustActiveSlide, icon, flipnav, atStart, atEnd })}
-      </div> */}
+      </div>
       <style>{styles}</style>
     </host>
   );
