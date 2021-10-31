@@ -5,9 +5,10 @@ import { useEventListener } from "./index";
 // onSwiping ({ direction, distance })
 // onSwipeEnd ({ direction, distance })
 export default function useSwipe({
-  minDistance = 100,
+  minDistance = 25,
   maxTime = -1,
   corners = false,
+  onSwipeStart,
   onSwiping,
   onSwipeEnd,
 } = {}) {
@@ -16,6 +17,7 @@ export default function useSwipe({
   const [swiping, setSwiping] = useState(false);
   const [swipeStartPos, setSwipeStartPos] = useState();
   const [swipeStartTime, setSwipeStartTime] = useState();
+  const [storedData, setStoredData] = useState(); // Data fed in by consumer to be echoed back on swipe end
 
   // Returns X/Y coordinates of an event
   function getPosition(event) {
@@ -69,8 +71,15 @@ export default function useSwipe({
     (event) => {
       event.preventDefault();
       setHeld(true);
-      setSwipeStartPos(getPosition(event));
-      setSwipeStartTime(Date.now());
+      const startPos = getPosition(event);
+      const startTime = getPosition(Date.now());
+      setSwipeStartPos(startPos);
+      setSwipeStartTime(startTime);
+      const stored = onSwipeStart({
+        swipeStartPos: startPos,
+        swipeStartTime: startTime,
+      });
+      setStoredData(stored);
     },
     [setHeld, setSwipeStartPos, setSwipeStartTime]
   );
@@ -111,7 +120,7 @@ export default function useSwipe({
         );
         if (distance >= minDistance) {
           if (typeof onSwipeEnd === "function")
-            onSwipeEnd({ direction, distance });
+            onSwipeEnd({ direction, distance, storedData });
         }
       }
     },

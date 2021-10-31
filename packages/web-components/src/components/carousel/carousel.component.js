@@ -10,12 +10,23 @@ import styles from "./carousel.scss";
 function Carousel() {
   const slotRef = useRef();
   const trackRef = useSwipe({
-    onSwiping: ({ direction, distance }) => {
-      //console.log(direction, distance);
+    onSwipeStart: () => {
+      const transitionStyle = trackRef.current.style.transition;
+      console.log(trackRef.current.style.transition);
+      trackRef.current.style.transition = "auto";
+      return transitionStyle;
     },
-    onSwipeEnd: ({ direction, distance }) => {
+    onSwiping: ({ direction, distance }) => {
+      const sign = direction === "right" ? 1 : 0;
+      trackRef.current.style.transform = `translateX(${
+        sign ? "" : "-"
+      }${distance}px)`;
+    },
+    onSwipeEnd: ({ direction, storedData }) => {
       if (direction === "left") adjustActiveSlide(1);
       if (direction === "right") adjustActiveSlide(-1);
+      console.log(storedData);
+      trackRef.current.style.transition = storedData;
     },
   });
   const childNodes = useSlot(slotRef);
@@ -29,6 +40,7 @@ function Carousel() {
   const [flipnav] = useProp("flipnav");
   const [focused, setFocused] = useState(false);
   const [activeSlide, setActiveSlide] = useState(loop ? 1 : 0);
+  const [transitionPauseResolve, setTransitionPauseResolve] = useState();
 
   const loopedChildren = loop
     ? [
@@ -85,6 +97,12 @@ function Carousel() {
     await nextFrame();
     await nextFrame();
     trackRef.current.style.transition = transitionStyle;
+  }
+
+  async function pauseTransition() {
+    return new Promise((resolve, reject) => {
+      setTransitionPauseResolve(resolve);
+    });
   }
 
   // Initialize autoplay
