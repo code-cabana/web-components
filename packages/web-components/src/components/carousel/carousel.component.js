@@ -140,13 +140,6 @@ function Carousel({
   function onResize() {
     determineSlidesPerPage();
     buildTrack();
-
-    // TODO need this??
-    // relcalculate currentSlide
-    // prevent hiding items when browser width increases
-    // if (this.currentSlide + this.perPage > this.innerElements.length) {
-    //   this.currentSlide = this.innerElements.length <= this.perPage ? 0 : this.innerElements.length - this.perPage;
-    // }
   }
 
   const numSlides = slides?.length || 1;
