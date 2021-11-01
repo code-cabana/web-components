@@ -5,6 +5,7 @@ import { debug } from "../../lib/logger";
 import { clamp } from "../../lib/math";
 import { cssJoin } from "../../lib/array";
 import { useEventListener } from "../../lib/hooks";
+import { nextFrame } from "../../lib/animation";
 import styles from "./carousel.scss";
 
 // Based on Siema
@@ -15,7 +16,7 @@ function Carousel({
   direction = "right",
   duration = 200,
   easing = "ease-out",
-  startSlide = 0,
+  startslide = 0,
   swipeable = true,
   threshold = 20,
   debug: dbug = false,
@@ -26,12 +27,12 @@ function Carousel({
   const carouselRef = useRef();
   const slotRef = useRef();
   const childNodes = useSlot(slotRef);
-  const [width, setWidth] = useState();
+  const [width, setWidth] = useState(0);
   const [slides, setSlides] = useState();
   const [activeSlide, setActiveSlide] = useState(0);
-  const [trackWidth, setTrackWidth] = useState();
   const [transition, setTransition] = useState(true);
   const [perPage, setPerPage] = useState(1);
+  const [position, setPosition] = useState(0);
 
   function debugLog(message) {
     dbug && debug("[Carousel]", message);
@@ -65,8 +66,8 @@ function Carousel({
   function determineStartSlide() {
     if (!slides) return;
     const newActiveSlide = loop
-      ? startSlide % slides.length
-      : clamp(startSlide, 0, slides.length);
+      ? startslide % slides.length
+      : clamp(startslide, 0, slides.length);
     setActiveSlide(newActiveSlide); // might be problem - dont want to do this on window resize
   }
 
@@ -79,7 +80,7 @@ function Carousel({
 
   // Build the track - sliding element that contains all slides
   function buildTrack() {
-    if (!carouselRef?.current || !slides) return;
+    if (!carouselRef?.current) return;
     const { offsetWidth } = carouselRef.current;
     setWidth(offsetWidth);
   }
@@ -95,15 +96,30 @@ function Carousel({
     if (typeof perPageNum === "number") setPerPage(perPageNum);
   }
 
-  function onResize() {
-    determineSlidesPerPage();
-    buildTrack();
+  // Returns the desired translation for the current active slide
+  function getCurrentPos() {
+    return (direction === "left" ? 1 : -1) * activeSlide * slideWidth;
+  }
+
+  // Moves the track to a given position
+  async function scrollToPos(newPos, smooth) {
+    if (smooth) {
+      setTransition(true);
+      await nextFrame();
+      await nextFrame();
+      setPosition(newPos);
+    } else {
+      setTransition(false);
+      await nextFrame();
+      await nextFrame();
+      setPosition(newPos);
+    }
   }
 
   // Effects
   useEffect(determineSlidesPerPage, [host]);
-  useEffect(buildSlides, [carouselRef, childNodes, loop, direction]);
-  useEffect(buildTrack, [slides]);
+  useEffect(buildSlides, [childNodes, direction, loop, perPage]);
+  useEffect(buildTrack, [carouselRef]);
   useEffect(determineStartSlide, [slides]);
 
   // Event listeners
@@ -120,7 +136,22 @@ function Carousel({
 
   // useEventListener("click", onClick, carouselRef.current);
 
+  // Handlers
+  function onResize() {
+    determineSlidesPerPage();
+    buildTrack();
+
+    // TODO need this??
+    // relcalculate currentSlide
+    // prevent hiding items when browser width increases
+    // if (this.currentSlide + this.perPage > this.innerElements.length) {
+    //   this.currentSlide = this.innerElements.length <= this.perPage ? 0 : this.innerElements.length - this.perPage;
+    // }
+  }
+
   const numSlides = slides?.length || 1;
+  const slideWidth = width / perPage;
+  const trackWidth = slideWidth * numSlides;
 
   return (
     <host shadowDom tabindex={0}>
@@ -129,10 +160,12 @@ function Carousel({
         class={cssJoin(["container", swipeable && "swipeable"])}
       >
         <div
-          class="track"
+          class={cssJoin(["track", transition && "transition"])}
           style={{
-            "--slideWidth": `${width / perPage}px`,
             "--numSlides": numSlides,
+            "--slideWidth": `${slideWidth}px`,
+            "--trackWidth": `${trackWidth}px`,
+            "--position": `${position}px`,
           }}
         >
           <slot ref={slotRef} name="slide" />

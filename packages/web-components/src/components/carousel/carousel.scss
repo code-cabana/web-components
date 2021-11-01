@@ -1,5 +1,7 @@
 $slideWidth: var(--slideWidth, 100%);
 $numSlides: var(--numSlides, 1);
+$trackWidth: var(--trackWidth, 100%);
+$position: var(--position, 0px);
 
 .container {
   position: relative;
@@ -28,15 +30,15 @@ $numSlides: var(--numSlides, 1);
 // Horizontally overflowing container of all slides
 .track {
   display: grid;
-  width: calc(#{$slideWidth} * #{numSlides});
+  width: $trackWidth;
   height: 100%;
   align-items: center;
   grid-template-columns: repeat($numSlides, $slideWidth);
-  // transform: translateX(calc(-1 * var(--activeSlide) * 100%));
+  transform: translateX($position);
 
-  // &.transition {
-  //   transition: transform var(--duration, 0.3s);
-  // }
+  &.transition {
+    transition: transform var(--duration, 0.3s);
+  }
 }
 
 // Slides
