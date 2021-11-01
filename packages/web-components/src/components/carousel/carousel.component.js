@@ -1,147 +1,145 @@
-import { c, useEffect, useProp, useRef, useState } from "atomico";
+import { c, useEffect, useHost, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { renderHtml } from "../../lib/dom";
+import { debug } from "../../lib/logger";
+import { clamp } from "../../lib/math";
 import { cssJoin } from "../../lib/array";
-import { nextFrame } from "../../lib/animation";
-import { useSwipe } from "../../lib/hooks";
-import Navigators from "./navigators";
+import { useEventListener } from "../../lib/hooks";
 import styles from "./carousel.scss";
 
-function Carousel() {
+// Based on Siema
+// https://github.com/pawelgrzybek/siema
+
+function Carousel({
+  loop = false,
+  direction = "right",
+  duration = 200,
+  easing = "ease-out",
+  startSlide = 0,
+  swipeable = true,
+  threshold = 20,
+  debug: dbug = false,
+  onInit = () => {},
+  onChange = () => {},
+} = {}) {
+  const host = useHost();
+  const carouselRef = useRef();
   const slotRef = useRef();
-  const trackRef = useSwipe({
-    onSwipeStart: () => {
-      const transitionStyle = trackRef.current.style.transition;
-      console.log(trackRef.current.style.transition);
-      //trackRef.current.style.transition = "auto";
-      return transitionStyle;
-    },
-    onSwiping: ({ direction, distance }) => {
-      const sign = direction === "right" ? 1 : 0;
-      trackRef.current.scrollLeft = `${sign}${distance}`;
-      // trackRef.current.style.transform = `translateX(${
-      //   sign ? "" : "-"
-      // }${distance}px)`;
-    },
-    onSwipeEnd: ({ direction, storedData }) => {
-      if (direction === "left") adjustActiveSlide(1);
-      if (direction === "right") adjustActiveSlide(-1);
-      console.log(storedData);
-      trackRef.current.style.transform = null;
-      trackRef.current.style.transition = storedData;
-    },
-  });
   const childNodes = useSlot(slotRef);
-  const [loop] = useProp("loop");
-  const [icon] = useProp("icon");
-  const [autoplay] = useProp("autoplay");
-  const [duration] = useProp("duration");
-  const [direction] = useProp("direction");
-  const [interval] = useProp("interval");
-  const [pauseonfocus] = useProp("pauseonfocus");
-  const [flipnav] = useProp("flipnav");
-  const [focused, setFocused] = useState(false);
-  const [activeSlide, setActiveSlide] = useState(loop ? 1 : 0);
+  const [width, setWidth] = useState();
+  const [slides, setSlides] = useState();
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [trackWidth, setTrackWidth] = useState();
+  const [transition, setTransition] = useState(true);
+  const [perPage, setPerPage] = useState(1);
 
-  const loopedChildren = loop
-    ? [
-        ...childNodes.slice(childNodes.length - 1),
-        ...childNodes,
-        ...childNodes.slice(0, 1),
-      ] // If looping is required, add the first slide to the end and last slide to the beginning
-    : childNodes;
-
-  const slides = loopedChildren
-    .filter((el) => el instanceof Element)
-    .map((child) => renderHtml(child.cloneNode(true).outerHTML));
-
-  const numSlides = slides.length;
-  const lastSlide = numSlides - 1;
-  const loopStart = 1;
-  const loopEnd = lastSlide - 1;
-  const atStart = !loop && activeSlide === 0;
-  const atEnd = !loop && activeSlide === lastSlide;
-
-  function goToSlide(index) {
-    const newIndex = Math.min(lastSlide, Math.max(0, index));
-    setActiveSlide(newIndex);
+  function debugLog(message) {
+    dbug && debug("[Carousel]", message);
   }
 
-  function adjustActiveSlide(count) {
-    goToSlide(activeSlide + count);
+  // Builds all slides provided to the slide slot
+  function buildSlides() {
+    if (!childNodes) return;
+
+    const newSlides = childNodes
+      .filter((el) => el instanceof Element)
+      .map(buildSlide);
+
+    // If direction is right to left, flip the array
+    const newSlidesDirected =
+      direction === "left" ? [...newSlides].reverse() : newSlides;
+
+    // If looping is required, add the first page to the end and last page to the beginning
+    const newSlidesLooped = loop
+      ? [
+          ...newSlidesDirected.slice(newSlidesDirected - perPage),
+          ...newSlidesDirected,
+          ...newSlidesDirected.slice(0, perPage),
+        ]
+      : newSlidesDirected;
+
+    setSlides(newSlidesLooped);
   }
 
-  function onTransitionEnd() {
-    if (!loop) return;
-    if (activeSlide > loopEnd) {
-      setActiveSlide(loopStart);
-      reset();
-    } else if (activeSlide < loopStart) {
-      setActiveSlide(loopEnd);
-      reset();
-    }
+  // Determines which slide should be shown on initialization
+  function determineStartSlide() {
+    if (!slides) return;
+    const newActiveSlide = loop
+      ? startSlide % slides.length
+      : clamp(startSlide, 0, slides.length);
+    setActiveSlide(newActiveSlide); // might be problem - dont want to do this on window resize
   }
 
-  // Arrow key navigation
-  function onKeyDown(event) {
-    if (!focused) return;
-    if (event.key === "ArrowRight") {
-      adjustActiveSlide(1);
-    } else if (event.key === "ArrowLeft") {
-      adjustActiveSlide(-1);
-    }
+  // Builds an individual slide
+  function buildSlide(childElement) {
+    const clone = childElement.cloneNode(true);
+    clone.setAttribute("class", "slide");
+    return renderHtml(clone.outerHTML);
   }
 
-  async function reset() {
-    const transitionStyle = trackRef.current.style.transition;
-    trackRef.current.style.transition = "none";
-    await nextFrame();
-    await nextFrame();
-    trackRef.current.style.transition = transitionStyle;
+  // Build the track - sliding element that contains all slides
+  function buildTrack() {
+    if (!carouselRef?.current || !slides) return;
+    const { offsetWidth } = carouselRef.current;
+    setWidth(offsetWidth);
   }
 
-  // Initialize autoplay
-  useEffect(() => {
-    if (!autoplay || numSlides <= 0) return;
-    const autoplayTimeoutRef = setTimeout(() => {
-      if (pauseonfocus && focused) return;
-      if (direction === "left") adjustActiveSlide(-1);
-      else adjustActiveSlide(1);
-    }, interval);
+  // Derive number of slides per page based on --perPage CSS variable
+  function determineSlidesPerPage() {
+    if (!host?.current) return;
+    const perPageStyle = getComputedStyle(host.current)?.getPropertyValue(
+      "--perPage"
+    );
+    if (!perPageStyle) return;
+    const perPageNum = parseInt(perPageStyle);
+    if (typeof perPageNum === "number") setPerPage(perPageNum);
+  }
 
-    return () => clearTimeout(autoplayTimeoutRef);
-  }, [activeSlide, numSlides, focused]);
+  function onResize() {
+    determineSlidesPerPage();
+    buildTrack();
+  }
+
+  // Effects
+  useEffect(determineSlidesPerPage, [host]);
+  useEffect(buildSlides, [carouselRef, childNodes, loop, direction]);
+  useEffect(buildTrack, [slides]);
+  useEffect(determineStartSlide, [slides]);
+
+  // Event listeners
+  useEventListener("resize", onResize, window);
+
+  // useEventListener("touchstart", onTouchStart, carouselRef.current);
+  // useEventListener("touchend", onTouchEnd, carouselRef.current);
+  // useEventListener("touchmove", onTouchMove, carouselRef.current);
+
+  // useEventListener("mousedown", onMouseDown, carouselRef.current);
+  // useEventListener("mouseup", onMouseUp, carouselRef.current);
+  // useEventListener("mouseleave", onMouseLeave, carouselRef.current);
+  // useEventListener("mousemove", onMouseMove, carouselRef.current);
+
+  // useEventListener("click", onClick, carouselRef.current);
+
+  const numSlides = slides?.length || 1;
 
   return (
-    <host
-      shadowDom
-      tabindex={0}
-      style={{
-        "--numSlides": numSlides,
-        "--duration": `${duration}s`,
-      }}
-      onfocus={() => setFocused(true)}
-      onblur={() => setFocused(false)}
-      onkeydown={onKeyDown}
-    >
-      <div class="container" part="container">
+    <host shadowDom tabindex={0}>
+      <div
+        ref={carouselRef}
+        class={cssJoin(["container", swipeable && "swipeable"])}
+      >
         <div
-          class={cssJoin(["overlay", focused && "focused"])}
-          part="overlay"
-        />
-        <div
-          class="track transition"
-          part="slides"
-          ref={trackRef}
-          ontransitionend={onTransitionEnd}
-          style={{ "--activeSlide": activeSlide }}
+          class="track"
+          style={{
+            "--slideWidth": `${width / perPage}px`,
+            "--numSlides": numSlides,
+          }}
         >
-          <slot name="slide" ref={slotRef} style="display: none;"></slot>
+          <slot ref={slotRef} name="slide" />
           {slides}
         </div>
-        {Navigators({ adjustActiveSlide, icon, flipnav, atStart, atEnd })}
+        <style>{styles}</style>
       </div>
-      <style>{styles}</style>
     </host>
   );
 }
@@ -150,47 +148,17 @@ Carousel.props = {
   loop: {
     type: Boolean,
     reflect: false,
-    value: true,
+    value: false,
   },
-  autoplay: {
+  debug: {
     type: Boolean,
     reflect: false,
     value: false,
-  },
-  interval: {
-    type: Number,
-    reflect: false,
-    value: 3000,
   },
   direction: {
     type: String,
     reflect: false,
     value: "right",
-  },
-  duration: {
-    type: Number,
-    reflect: false,
-    value: 0.3,
-  },
-  pauseonfocus: {
-    type: Boolean,
-    reflect: false,
-    value: true,
-  },
-  draggable: {
-    type: Boolean,
-    reflect: false,
-    value: true,
-  },
-  icon: {
-    type: String,
-    reflect: false,
-    value: "https://codecabana.com.au/pkg/@latest/img/arrow.png",
-  },
-  flipnav: {
-    type: Boolean,
-    reflect: false,
-    value: false,
   },
 };
 
