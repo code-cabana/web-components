@@ -52,57 +52,57 @@ $position: var(--position, 0px);
   object-fit: cover;
 }
 
-// .navigators {
-//   display: inline-grid;
-//   grid-auto-flow: column;
-//   justify-content: space-between;
-//   align-items: center;
-//   box-sizing: border-box;
-//   position: absolute;
-//   top: 0;
-//   bottom: 0;
-//   width: 100%;
-//   padding: 1%;
-//   pointer-events: none;
-//   z-index: 2;
+.navigators {
+  display: inline-grid;
+  grid-auto-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 1%;
+  pointer-events: none;
+  z-index: 2;
 
-//   button {
-//     cursor: pointer;
-//     pointer-events: all;
-//     background-color: transparent;
-//     border: none;
+  button {
+    cursor: pointer;
+    pointer-events: all;
+    background-color: transparent;
+    border: none;
 
-//     $maxWidth: 96px;
-//     width: 15vw;
-//     max-width: $maxWidth;
-//     padding: 16px;
-//     transition: width 0.1s, max-width 0.1s;
+    $maxWidth: 96px;
+    width: 15vw;
+    max-width: $maxWidth;
+    padding: 16px;
+    transition: width 0.1s, max-width 0.1s;
 
-//     img {
-//       max-width: 100%;
-//     }
+    img {
+      max-width: 100%;
+    }
 
-//     &.disabled {
-//       width: calc(#{$maxWidth} / 1.25);
-//       opacity: 0.5;
-//       cursor: auto;
-//     }
+    &.disabled {
+      width: calc(#{$maxWidth} / 1.25);
+      opacity: 0.5;
+      cursor: auto;
+    }
 
-//     &:hover:not(.disabled) {
-//       $enlargedWidth: calc(#{$maxWidth} * 1.15);
-//       width: $enlargedWidth;
-//       max-width: $enlargedWidth;
-//     }
+    &:hover:not(.disabled) {
+      $enlargedWidth: calc(#{$maxWidth} * 1.15);
+      width: $enlargedWidth;
+      max-width: $enlargedWidth;
+    }
 
-//     &.next {
-//       justify-self: end;
-//     }
-//   }
-// }
+    &.next {
+      justify-self: end;
+    }
+  }
+}
 
-// .flip {
-//   transform: rotate(180deg);
-// }
+.flip {
+  transform: rotate(180deg);
+}
 
 slot {
   display: none;

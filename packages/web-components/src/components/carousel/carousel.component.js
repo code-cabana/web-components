@@ -1,11 +1,12 @@
 import { c, useEffect, useHost, useRef, useState } from "atomico";
+import { useEventListener, useSwipe } from "../../lib/hooks";
 import { useSlot } from "@atomico/hooks/use-slot";
+import { nextFrame } from "../../lib/animation";
 import { renderHtml } from "../../lib/dom";
+import { cssJoin } from "../../lib/array";
 import { debug } from "../../lib/logger";
 import { clamp } from "../../lib/math";
-import { cssJoin } from "../../lib/array";
-import { useEventListener } from "../../lib/hooks";
-import { nextFrame } from "../../lib/animation";
+import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
 // Based on Siema
@@ -13,20 +14,22 @@ import styles from "./carousel.scss";
 
 function Carousel({
   loop = false,
+  icon,
+  flipnav,
   direction = "right",
   duration = 200,
   easing = "ease-out",
   startslide = 0,
   swipeable = true,
-  threshold = 20,
   debug: dbug = false,
-  onInit = () => {},
-  onChange = () => {},
+  oninit = () => {},
+  onchange = () => {},
 } = {}) {
   const host = useHost();
   const carouselRef = useRef();
   const slotRef = useRef();
   const childNodes = useSlot(slotRef);
+  const trackRef = useSwipe({ onSwipeStart, onSwiping, onSwipeEnd });
   const [width, setWidth] = useState(0);
   const [slides, setSlides] = useState();
   const [activeSlide, setActiveSlide] = useState(0);
@@ -96,13 +99,18 @@ function Carousel({
     if (typeof perPageNum === "number") setPerPage(perPageNum);
   }
 
-  // Returns the desired translation for the current active slide
-  function getCurrentPos() {
-    return (direction === "left" ? 1 : -1) * activeSlide * slideWidth;
+  // Increments / decrements the active slide
+  function adjustActiveSlide(count) {
+    goToSlide(activeSlide + count, true);
   }
 
-  // Moves the track to a given position
-  async function scrollToPos(newPos, smooth) {
+  // Moves the track to display a given slide
+  async function goToSlide(index, smooth) {
+    const newIndex = clamp(index, 0, lastSlide);
+    setActiveSlide(newIndex);
+
+    const newPos = getSlidePos(newIndex);
+    console.log("GOING", index, slideWidth, newPos);
     if (smooth) {
       setTransition(true);
       await nextFrame();
@@ -116,6 +124,25 @@ function Carousel({
     }
   }
 
+  // Returns the desired translation of a target slide
+  function getSlidePos(index) {
+    return -1 * slideWidth * index;
+  }
+
+  function onSwipeStart() {
+    setTransition(false);
+  }
+
+  function onSwiping({ direction, distance }) {
+    const sign = direction === "right" ? 1 : -1;
+    setPosition(sign * distance);
+  }
+
+  function onSwipeEnd() {
+    console.log("onSwipeEnd");
+    // TODO snap to the closest slide position
+  }
+
   // Effects
   useEffect(determineSlidesPerPage, [host]);
   useEffect(buildSlides, [childNodes, direction, loop, perPage]);
@@ -125,17 +152,6 @@ function Carousel({
   // Event listeners
   useEventListener("resize", onResize, window);
 
-  // useEventListener("touchstart", onTouchStart, carouselRef.current);
-  // useEventListener("touchend", onTouchEnd, carouselRef.current);
-  // useEventListener("touchmove", onTouchMove, carouselRef.current);
-
-  // useEventListener("mousedown", onMouseDown, carouselRef.current);
-  // useEventListener("mouseup", onMouseUp, carouselRef.current);
-  // useEventListener("mouseleave", onMouseLeave, carouselRef.current);
-  // useEventListener("mousemove", onMouseMove, carouselRef.current);
-
-  // useEventListener("click", onClick, carouselRef.current);
-
   // Handlers
   function onResize() {
     determineSlidesPerPage();
@@ -143,6 +159,10 @@ function Carousel({
   }
 
   const numSlides = slides?.length || 1;
+  const lastSlide = numSlides - 1;
+  const atStart = !loop && activeSlide === 0;
+  const atEnd = !loop && activeSlide === lastSlide;
+
   const slideWidth = width / perPage;
   const trackWidth = slideWidth * numSlides;
 
@@ -153,6 +173,7 @@ function Carousel({
         class={cssJoin(["container", swipeable && "swipeable"])}
       >
         <div
+          ref={trackRef}
           class={cssJoin(["track", transition && "transition"])}
           style={{
             "--numSlides": numSlides,
@@ -164,6 +185,7 @@ function Carousel({
           <slot ref={slotRef} name="slide" />
           {slides}
         </div>
+        {Navigators({ adjustActiveSlide, icon, flipnav, atStart, atEnd })}
         <style>{styles}</style>
       </div>
     </host>
@@ -185,6 +207,16 @@ Carousel.props = {
     type: String,
     reflect: false,
     value: "right",
+  },
+  icon: {
+    type: String,
+    reflect: false,
+    value: "https://codecabana.com.au/pkg/@latest/img/arrow.png",
+  },
+  flipnav: {
+    type: Boolean,
+    reflect: false,
+    value: false,
   },
 };
 
