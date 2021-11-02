@@ -8,20 +8,18 @@ import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
-// Based on Siema
-// https://github.com/pawelgrzybek/siema
-
 function Carousel({
-  loop = false,
+  width: _width,
+  height,
+  loop,
   icon,
   flipnav,
-  direction = "right",
-  allowswiping = true,
-  dragthreshold = 500,
-  duration = 200,
-  easing = "ease-out",
-  startslide = 0,
-  swipeable = true,
+  reverse,
+  dragthreshold,
+  easing,
+  duration,
+  startslide,
+  swipeable,
   oninit = () => {},
   onchange = () => {},
 } = {}) {
@@ -37,7 +35,6 @@ function Carousel({
   const [perPage, setPerPage] = useState(1);
   const [position, setPosition] = useState(0);
   const [swipeStartPos, setSwipeStartPos] = useState(0);
-  // TODO refresh when props change
 
   // Builds all slides provided to the slide slot
   function buildSlides() {
@@ -48,17 +45,16 @@ function Carousel({
       .map(buildSlide);
 
     // If direction is right to left, flip the array
-    const newSlidesDirected =
-      direction === "left" ? [...newSlides].reverse() : newSlides;
+    const newSlidesReversed = reverse ? [...newSlides].reverse() : newSlides;
 
     // If looping is required, add the first page to the end and last page to the beginning
     const newSlidesLooped = loop
       ? [
-          ...newSlidesDirected.slice(newSlidesDirected - perPage),
-          ...newSlidesDirected,
-          ...newSlidesDirected.slice(0, perPage),
+          ...newSlidesReversed.slice(newSlidesReversed - perPage),
+          ...newSlidesReversed,
+          ...newSlidesReversed.slice(0, perPage),
         ]
-      : newSlidesDirected;
+      : newSlidesReversed;
 
     setSlides(newSlidesLooped);
   }
@@ -165,10 +161,26 @@ function Carousel({
     }
   }
 
+  // For usage as a dependency
+  const allProps = [
+    _width,
+    height,
+    loop,
+    icon,
+    flipnav,
+    reverse,
+    dragthreshold,
+    easing,
+    duration,
+    startslide,
+    swipeable,
+    perPage,
+  ];
+
   // Effects
   useEffect(determineSlidesPerPage, [host]);
-  useEffect(buildSlides, [childNodes, direction, loop, perPage]);
-  useEffect(buildTrack, [carouselRef]);
+  useEffect(buildSlides, [...allProps, childNodes]);
+  useEffect(buildTrack, [...allProps, carouselRef]);
   useEffect(determineStartSlide, [slides]);
 
   // Event listeners
@@ -193,6 +205,7 @@ function Carousel({
       <div
         ref={carouselRef}
         class={cssJoin(["container", swipeable && "swipeable"])}
+        style={{ "--width": _width, "--height": height }}
       >
         <div
           ref={trackRef}
@@ -202,6 +215,8 @@ function Carousel({
             "--slideWidth": `${slideWidth}px`,
             "--trackWidth": `${trackWidth}px`,
             "--position": `${position}px`,
+            "--easing": easing,
+            "--duration": duration,
           }}
         >
           <slot ref={slotRef} name="slide" />
@@ -215,26 +230,53 @@ function Carousel({
 }
 
 Carousel.props = {
+  width: {
+    type: String,
+    value: "100%",
+  },
+  height: {
+    type: String,
+    value: "600px",
+  },
   loop: {
     type: Boolean,
-    reflect: false,
     value: false,
   },
-  direction: {
-    type: String,
-    reflect: false,
-    value: "right",
+  reverse: {
+    type: Boolean, // Reverse slide order
+    value: false,
   },
   icon: {
     type: String,
-    reflect: false,
     value: "https://codecabana.com.au/pkg/@latest/img/arrow.png",
   },
   flipnav: {
     type: Boolean,
-    reflect: false,
     value: false,
   },
+  duration: {
+    type: Number,
+    value: 200,
+  },
+  easing: {
+    type: String,
+    value: "ease-out",
+  },
+  dragthreshold: {
+    type: Number, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    value: 500,
+  },
+  startslide: {
+    type: Number, // Slide to begin on
+    value: 0,
+  },
+  swipeable: {
+    type: Boolean, // Carousel can be swiped/dragged
+    value: true,
+  },
 };
+
+// CSS props (so that they can be controlled via media query)
+// --perPage
 
 customElements.define("codecabana-carousel", c(Carousel));
