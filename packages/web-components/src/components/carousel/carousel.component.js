@@ -42,7 +42,7 @@ function Carousel({
 
   // Builds all slides provided to the slide slot
   function buildSlides() {
-    if (!childNodes) return;
+    if (!childNodes || childNodes.length <= 0) return;
 
     const newSlides = childNodes
       .filter((el) => el instanceof Element)
@@ -54,7 +54,7 @@ function Carousel({
     // If looping is required, add the first page to the end and last page to the beginning
     const newSlidesLooped = loop
       ? [
-          ...newSlidesReversed.slice(newSlidesReversed - perPage),
+          ...newSlidesReversed.slice(newSlidesReversed.length - perPage),
           ...newSlidesReversed,
           ...newSlidesReversed.slice(0, perPage),
         ]
@@ -65,11 +65,11 @@ function Carousel({
 
   // Determines which slide should be shown on initialization
   function determineStartSlide() {
-    if (!slides) return;
+    if (!childNodes || childNodes.length <= 0) return;
     const newActiveSlide = loop
-      ? startslide % slides.length
-      : clamp(startslide, 0, slides.length);
-    setActiveSlide(newActiveSlide); // might be problem - dont want to do this on window resize
+      ? (startslide % childNodes.length) + perPage
+      : clamp(startslide, 0, childNodes.length);
+    goToSlide(newActiveSlide); // might be problem - dont want to do this on window resize
   }
 
   // Builds an individual slide
@@ -140,6 +140,13 @@ function Carousel({
     return -1 * slideWidth * index;
   }
 
+  function onTransitionEnd() {
+    console.log("AAA");
+    if (!loop) return;
+    if (activeSlide > loopEnd) goToSlide(loopStart);
+    else if (activeSlide < loopStart) goToSlide(loopEnd);
+  }
+
   function onSwipeStart() {
     setTransition(false);
     setSwipeStartPos(position);
@@ -201,6 +208,8 @@ function Carousel({
   const lastSlide = numSlides - perPage;
   const atStart = !loop && activeSlide === 0;
   const atEnd = !loop && activeSlide === lastSlide;
+  const loopStart = perPage;
+  const loopEnd = lastSlide - perPage;
 
   const slideWidth = width / perPage;
   const trackWidth = slideWidth * numSlides;
@@ -215,6 +224,7 @@ function Carousel({
         <div
           ref={trackRef}
           class={cssJoin(["track", transition && "transition"])}
+          ontransitionend={onTransitionEnd}
           style={{
             "--numSlides": numSlides,
             "--slideWidth": `${slideWidth}px`,
