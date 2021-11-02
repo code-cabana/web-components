@@ -9,10 +9,13 @@ $position: var(--position, 0px);
   height: var(--height, 600px);
   overflow: hidden;
   background: #3b3636;
-  direction: var(--direction, "ltr");
 
   &.swipeable {
     cursor: grab;
+  }
+
+  &:focus {
+    box-shadow: 0 0 5px 5px #a0a0a0 inset;
   }
 }
 
@@ -24,9 +27,9 @@ $position: var(--position, 0px);
 //   z-index: 1;
 //   transition: box-shadow 0.3s;
 
-//   &.focused {
-//     box-shadow: 0 0 5px 5px #a0a0a0 inset;
-//   }
+// &.focused {
+//   box-shadow: 0 0 5px 5px #a0a0a0 inset;
+// }
 // }
 
 // Horizontally overflowing container of all slides
@@ -52,6 +55,7 @@ $position: var(--position, 0px);
   width: $slideWidth;
   height: 100%;
   object-fit: cover;
+  z-index: -100;
 }
 
 .navigators {

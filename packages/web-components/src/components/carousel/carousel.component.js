@@ -20,14 +20,18 @@ function Carousel({
   duration,
   startslide,
   swipeable,
-  oninit = () => {},
   onchange = () => {},
 } = {}) {
+  // Refs
   const host = useHost();
   const carouselRef = useRef();
   const slotRef = useRef();
   const childNodes = useSlot(slotRef);
-  const trackRef = useSwipe({ onSwipeStart, onSwiping, onSwipeEnd });
+  const trackRef = swipeable
+    ? useSwipe({ onSwipeStart, onSwiping, onSwipeEnd })
+    : undefined;
+
+  // State
   const [width, setWidth] = useState(0);
   const [slides, setSlides] = useState();
   const [activeSlide, setActiveSlide] = useState(0);
@@ -116,6 +120,7 @@ function Carousel({
       setPos(newPos);
     }
     setSwipeStartPos(newPos);
+    onchange({ index: newIndex, position: newPos, smooth });
   }
 
   // Snaps to the closest slide based on current position
@@ -216,7 +221,7 @@ function Carousel({
             "--trackWidth": `${trackWidth}px`,
             "--position": `${position}px`,
             "--easing": easing,
-            "--duration": duration,
+            "--duration": `${duration / 1000}s`,
           }}
         >
           <slot ref={slotRef} name="slide" />
@@ -231,35 +236,35 @@ function Carousel({
 
 Carousel.props = {
   width: {
-    type: String,
+    type: String, // Width of the carousel
     value: "100%",
   },
   height: {
-    type: String,
+    type: String, // Height of the carousel
     value: "600px",
   },
   loop: {
-    type: Boolean,
-    value: false,
+    type: Boolean, // When reaching the beginning / end, loop around to the other side
+    value: true,
   },
   reverse: {
     type: Boolean, // Reverse slide order
     value: false,
   },
   icon: {
-    type: String,
+    type: String, // Image used for navigator buttons
     value: "https://codecabana.com.au/pkg/@latest/img/arrow.png",
   },
   flipnav: {
-    type: Boolean,
+    type: Boolean, // Reverse the direction of the navigator button icons
     value: false,
   },
   duration: {
-    type: Number,
-    value: 200,
+    type: Number, // How long slide transitions take in milliseconds
+    value: 300,
   },
   easing: {
-    type: String,
+    type: String, // https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
     value: "ease-out",
   },
   dragthreshold: {
@@ -274,9 +279,13 @@ Carousel.props = {
     type: Boolean, // Carousel can be swiped/dragged
     value: true,
   },
+  onchange: {
+    type: Function, // Do something when the active slide is changed
+    value: () => {},
+  },
 };
 
 // CSS props (so that they can be controlled via media query)
-// --perPage
+// --perPage - how many slides to show per page of the carousel
 
 customElements.define("codecabana-carousel", c(Carousel));
