@@ -141,10 +141,9 @@ function Carousel({
   }
 
   function onTransitionEnd() {
-    console.log("AAA");
     if (!loop) return;
-    if (activeSlide > loopEnd) goToSlide(loopStart);
-    else if (activeSlide < loopStart) goToSlide(loopEnd);
+    if (activeSlide > numSlides - perPage - 1) goToSlide(loopStart);
+    else if (activeSlide === 0) goToSlide(loopEnd);
   }
 
   function onSwipeStart() {
