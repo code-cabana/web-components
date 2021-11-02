@@ -71,7 +71,7 @@ export default function useSwipe({
       event.preventDefault();
       setHeld(true);
       setSwipeStartPos(getPosition(event));
-      setSwipeStartTime(getPosition(Date.now()));
+      setSwipeStartTime(Date.now());
     },
     [setHeld, setSwipeStartPos, setSwipeStartTime]
   );
@@ -104,15 +104,15 @@ export default function useSwipe({
       if (!swiping) return;
       setSwiping(false);
 
-      const elapsedTime = Date.now() - swipeStartTime;
-      if (maxTime === -1 || elapsedTime <= maxTime) {
+      const time = Date.now() - swipeStartTime;
+      if (maxTime === -1 || time <= maxTime) {
         const swipeEndPos = getPosition(event);
         const { direction, distance } = getDirAndDist(
           swipeStartPos,
           swipeEndPos
         );
         if (typeof onSwipeEnd === "function")
-          onSwipeEnd({ direction, distance });
+          onSwipeEnd({ direction, distance, time });
       }
     },
     [setHeld, setSwiping, onSwipeEnd]

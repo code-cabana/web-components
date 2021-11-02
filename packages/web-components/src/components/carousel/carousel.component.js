@@ -4,7 +4,6 @@ import { useSlot } from "@atomico/hooks/use-slot";
 import { nextFrame } from "../../lib/animation";
 import { renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
-import { debug } from "../../lib/logger";
 import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
 import styles from "./carousel.scss";
@@ -17,11 +16,12 @@ function Carousel({
   icon,
   flipnav,
   direction = "right",
+  allowswiping = true,
+  dragthreshold = 500,
   duration = 200,
   easing = "ease-out",
   startslide = 0,
   swipeable = true,
-  debug: dbug = false,
   oninit = () => {},
   onchange = () => {},
 } = {}) {
@@ -37,10 +37,7 @@ function Carousel({
   const [perPage, setPerPage] = useState(1);
   const [position, setPosition] = useState(0);
   const [swipeStartPos, setSwipeStartPos] = useState(0);
-
-  function debugLog(message) {
-    dbug && debug("[Carousel]", message);
-  }
+  // TODO refresh when props change
 
   // Builds all slides provided to the slide slot
   function buildSlides() {
@@ -153,8 +150,19 @@ function Carousel({
     setPos(swipeStartPos + swipeDelta);
   }
 
-  function onSwipeEnd() {
-    snapToClosestSlide();
+  function onSwipeEnd({ distance, direction, time }) {
+    const distanceMultiplier = 250 * (distance / width); // Bigger swipes should require more time to be considered a drag
+    const isDrag = perPage > 2 || time > dragthreshold + distanceMultiplier;
+    if (isDrag) {
+      snapToClosestSlide(); // Snap to closest slide if user is not trying to swipe
+    } else {
+      const delta = Math.max(
+        Math.abs(Math.round(distance / (slideWidth / 2))),
+        1
+      );
+      direction === "left" && adjustActiveSlide(1 * delta);
+      direction === "right" && adjustActiveSlide(-1 * delta);
+    }
   }
 
   // Effects
@@ -208,11 +216,6 @@ function Carousel({
 
 Carousel.props = {
   loop: {
-    type: Boolean,
-    reflect: false,
-    value: false,
-  },
-  debug: {
     type: Boolean,
     reflect: false,
     value: false,
