@@ -36,6 +36,7 @@ function Carousel({
   const [transition, setTransition] = useState(true);
   const [perPage, setPerPage] = useState(1);
   const [position, setPosition] = useState(0);
+  const [swipeStartPos, setSwipeStartPos] = useState(0);
 
   function debugLog(message) {
     dbug && debug("[Carousel]", message);
@@ -110,18 +111,30 @@ function Carousel({
     setActiveSlide(newIndex);
 
     const newPos = getSlidePos(newIndex);
-    console.log("GOING", index, slideWidth, newPos);
     if (smooth) {
       setTransition(true);
       await nextFrame();
       await nextFrame();
-      setPosition(newPos);
+      setPos(newPos);
     } else {
       setTransition(false);
       await nextFrame();
       await nextFrame();
-      setPosition(newPos);
+      setPos(newPos);
     }
+    setSwipeStartPos(newPos);
+  }
+
+  // Snaps to the closest slide based on current position
+  function snapToClosestSlide() {
+    const closestIndex = Math.abs(Math.round(position / slideWidth));
+    goToSlide(closestIndex, true);
+  }
+
+  // Setter for position state to clamp it within track length
+  function setPos(newPos) {
+    const maxPos = -1 * slideWidth * (numSlides - perPage);
+    setPosition(clamp(newPos, maxPos, 0));
   }
 
   // Returns the desired translation of a target slide
@@ -131,16 +144,17 @@ function Carousel({
 
   function onSwipeStart() {
     setTransition(false);
+    setSwipeStartPos(position);
   }
 
   function onSwiping({ direction, distance }) {
     const sign = direction === "right" ? 1 : -1;
-    setPosition(sign * distance);
+    const swipeDelta = sign * distance;
+    setPos(swipeStartPos + swipeDelta);
   }
 
   function onSwipeEnd() {
-    console.log("onSwipeEnd");
-    // TODO snap to the closest slide position
+    snapToClosestSlide();
   }
 
   // Effects
@@ -159,7 +173,7 @@ function Carousel({
   }
 
   const numSlides = slides?.length || 1;
-  const lastSlide = numSlides - 1;
+  const lastSlide = numSlides - perPage;
   const atStart = !loop && activeSlide === 0;
   const atEnd = !loop && activeSlide === lastSlide;
 
