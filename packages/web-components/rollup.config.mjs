@@ -28,7 +28,7 @@ export default components.map((component) => ({
     scss({ output: false }),
     babel(),
     commonjs(),
-    terser(),
+    production && terser(),
   ],
   watch: {
     clearScreen: false,

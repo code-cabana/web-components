@@ -39,6 +39,7 @@ function Carousel({
   const [perPage, setPerPage] = useState(1);
   const [position, setPosition] = useState(0);
   const [swipeStartPos, setSwipeStartPos] = useState(0);
+  const [focused, setFocused] = useState(false);
 
   // Builds all slides provided to the slide slot
   function buildSlides() {
@@ -103,11 +104,16 @@ function Carousel({
   }
 
   // Moves the track to display a given slide
-  async function goToSlide(index, smooth) {
+  function goToSlide(index, smooth) {
     const newIndex = clamp(index, 0, lastSlide);
     setActiveSlide(newIndex);
 
     const newPos = getSlidePos(newIndex);
+    goToPos(newPos, smooth);
+    onchange({ index: newIndex, position: newPos, smooth });
+  }
+
+  async function goToPos(newPos, smooth) {
     if (smooth) {
       setTransition(true);
       await nextFrame();
@@ -120,7 +126,6 @@ function Carousel({
       setPos(newPos);
     }
     setSwipeStartPos(newPos);
-    onchange({ index: newIndex, position: newPos, smooth });
   }
 
   // Snaps to the closest slide based on current position
@@ -131,28 +136,43 @@ function Carousel({
 
   // Setter for position state to clamp it within track length
   function setPos(newPos) {
-    const maxPos = -1 * slideWidth * (numSlides - perPage);
-    setPosition(clamp(newPos, maxPos, 0));
+    setPosition(clamp(newPos, 0, trackWidth));
   }
 
   // Returns the desired translation of a target slide
   function getSlidePos(index) {
-    return -1 * slideWidth * index;
+    return index * slideWidth;
   }
 
-  function onTransitionEnd() {
+  // Wrap around to the beginning/end if looping is enabled
+  function wrapPosition() {
+    if (!loop) return;
+    const isPastLoop = position >= loopEndPos;
+    const isBeforeLoop = position < loopStartPos;
+    if (isPastLoop) goToPos(loopStartPos + (position - loopEndPos));
+    else if (isBeforeLoop) goToPos(loopEndPos - (loopStartPos - position));
+    return isPastLoop || isBeforeLoop;
+  }
+
+  // Wrap around to the beginning/end if looping is enabled
+  function wrapSlide() {
     if (!loop) return;
     if (activeSlide > numSlides - perPage - 1) goToSlide(loopStart);
     else if (activeSlide === 0) goToSlide(loopEnd);
   }
 
+  function onTransitionEnd() {
+    wrapSlide();
+  }
+
   function onSwipeStart() {
     setTransition(false);
+    if (wrapPosition()) return;
     setSwipeStartPos(position);
   }
 
   function onSwiping({ direction, distance }) {
-    const sign = direction === "right" ? 1 : -1;
+    const sign = direction === "right" ? -1 : 1;
     const swipeDelta = sign * distance;
     setPos(swipeStartPos + swipeDelta);
   }
@@ -160,6 +180,7 @@ function Carousel({
   function onSwipeEnd({ distance, direction, time }) {
     const distanceMultiplier = 250 * (distance / width); // Bigger swipes should require more time to be considered a drag
     const isDrag = perPage > 2 || time > dragthreshold + distanceMultiplier;
+
     if (isDrag) {
       snapToClosestSlide(); // Snap to closest slide if user is not trying to swipe
     } else {
@@ -204,22 +225,29 @@ function Carousel({
   }
 
   const numSlides = slides?.length || 1;
-  const lastSlide = numSlides - perPage;
+  const lastSlide = numSlides - 1;
+  const slideWidth = width / perPage;
+  const trackWidth = slideWidth * numSlides;
   const atStart = !loop && activeSlide === 0;
   const atEnd = !loop && activeSlide === lastSlide;
   const loopStart = perPage;
-  const loopEnd = lastSlide - perPage;
-
-  const slideWidth = width / perPage;
-  const trackWidth = slideWidth * numSlides;
+  const loopEnd = numSlides - perPage;
+  const loopStartPos = loopStart * slideWidth;
+  const loopEndPos = loopEnd * slideWidth;
 
   return (
-    <host shadowDom tabindex={0}>
+    <host
+      shadowDom
+      tabindex={0}
+      onfocus={() => setFocused(true)}
+      onblur={() => setFocused(false)}
+    >
       <div
         ref={carouselRef}
         class={cssJoin(["container", swipeable && "swipeable"])}
         style={{ "--width": _width, "--height": height }}
       >
+        <div class={cssJoin(["overlay", focused && "focused"])} />
         <div
           ref={trackRef}
           class={cssJoin(["track", transition && "transition"])}
@@ -228,7 +256,7 @@ function Carousel({
             "--numSlides": numSlides,
             "--slideWidth": `${slideWidth}px`,
             "--trackWidth": `${trackWidth}px`,
-            "--position": `${position}px`,
+            "--position": `${-1 * position}px`,
             "--easing": easing,
             "--duration": `${duration / 1000}s`,
           }}
