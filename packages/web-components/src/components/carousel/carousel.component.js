@@ -113,6 +113,7 @@ function Carousel({
     onchange({ index: newIndex, position: newPos, smooth });
   }
 
+  // Moves the track to display a given position
   async function goToPos(newPos, smooth) {
     if (smooth) {
       setTransition(true);
@@ -129,7 +130,7 @@ function Carousel({
   }
 
   // Snaps to the closest slide based on current position
-  function snapToClosestSlide() {
+  function goToClosestSlide() {
     const closestIndex = Math.abs(Math.round(position / slideWidth));
     goToSlide(closestIndex, true);
   }
@@ -149,20 +150,24 @@ function Carousel({
     if (!loop) return;
     const isPastLoop = position >= loopEndPos;
     const isBeforeLoop = position < loopStartPos;
+    if (isPastLoop || isBeforeLoop) console.log("Wrapping position");
     if (isPastLoop) goToPos(loopStartPos + (position - loopEndPos));
     else if (isBeforeLoop) goToPos(loopEndPos - (loopStartPos - position));
     return isPastLoop || isBeforeLoop;
   }
 
   // Wrap around to the beginning/end if looping is enabled
+  // TODO - need to do this on arrow key press not on transition end, because you can keep scrolling
   function wrapSlide() {
     if (!loop) return;
-    if (activeSlide > numSlides - perPage - 1) goToSlide(loopStart);
-    else if (activeSlide === 0) goToSlide(loopEnd);
-  }
-
-  function onTransitionEnd() {
-    wrapSlide();
+    console.log(activeSlide);
+    const atEnd = activeSlide >= loopEnd;
+    const atStart = activeSlide <= 0;
+    if (atStart) console.log("atStart", activeSlide);
+    if (atEnd)
+      console.log("atEnd", activeSlide, loopEnd, activeSlide - loopEnd);
+    if (atEnd) goToSlide(loopStart + (activeSlide - loopEnd));
+    else if (atStart) goToSlide(loopEnd - (loopStart - activeSlide));
   }
 
   function onSwipeStart() {
@@ -182,7 +187,7 @@ function Carousel({
     const isDrag = perPage > 2 || time > dragthreshold + distanceMultiplier;
 
     if (isDrag) {
-      snapToClosestSlide(); // Snap to closest slide if user is not trying to swipe
+      goToClosestSlide(); // Snap to closest slide if user is not trying to swipe
     } else {
       const delta = Math.max(
         Math.abs(Math.round(distance / (slideWidth / 2))),
@@ -190,6 +195,16 @@ function Carousel({
       );
       direction === "left" && adjustActiveSlide(1 * delta);
       direction === "right" && adjustActiveSlide(-1 * delta);
+    }
+  }
+
+  // Arrow key navigation
+  function onKeyDown(event) {
+    if (!focused) return;
+    if (event.key === "ArrowRight") {
+      adjustActiveSlide(1);
+    } else if (event.key === "ArrowLeft") {
+      adjustActiveSlide(-1);
     }
   }
 
@@ -217,6 +232,7 @@ function Carousel({
 
   // Event listeners
   useEventListener("resize", onResize, window);
+  useEventListener("keydown", onKeyDown, document);
   useOnClickOutside(host, () => setFocused(false));
 
   // Handlers
@@ -242,10 +258,7 @@ function Carousel({
       tabindex={0}
       onclick={() => setFocused(true)}
       onfocus={() => setFocused(true)}
-      onblur={() => {
-        console.log("BLUR");
-        setFocused(false);
-      }}
+      onblur={() => setFocused(false)}
     >
       <div
         ref={carouselRef}
@@ -256,7 +269,7 @@ function Carousel({
         <div
           ref={trackRef}
           class={cssJoin(["track", transition && "transition"])}
-          ontransitionend={onTransitionEnd}
+          ontransitionend={wrapSlide}
           style={{
             "--numSlides": numSlides,
             "--slideWidth": `${slideWidth}px`,
