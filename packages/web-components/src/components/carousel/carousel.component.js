@@ -1,5 +1,5 @@
 import { c, useEffect, useHost, useRef, useState } from "atomico";
-import { useEventListener, useSwipe } from "../../lib/hooks";
+import { useEventListener, useSwipe, useOnClickOutside } from "../../lib/hooks";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { nextFrame } from "../../lib/animation";
 import { renderHtml } from "../../lib/dom";
@@ -217,6 +217,7 @@ function Carousel({
 
   // Event listeners
   useEventListener("resize", onResize, window);
+  useOnClickOutside(host, () => setFocused(false));
 
   // Handlers
   function onResize() {
@@ -239,8 +240,12 @@ function Carousel({
     <host
       shadowDom
       tabindex={0}
+      onclick={() => setFocused(true)}
       onfocus={() => setFocused(true)}
-      onblur={() => setFocused(false)}
+      onblur={() => {
+        console.log("BLUR");
+        setFocused(false);
+      }}
     >
       <div
         ref={carouselRef}

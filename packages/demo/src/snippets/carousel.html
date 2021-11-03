@@ -22,6 +22,13 @@
   <img slot="slide" src="https://source.unsplash.com/random/400x400?19" alt="random unsplash image" /> -->
 </codecabana-carousel>
 
+<script>
+  console.log(document.activeElement);
+  document.addEventListener("focus", () => {
+    console.log("focused: ", document.activeElement)
+  }, true);
+</script>
+
 <hr />
 <p>Some stuff after the carousel</p>
 <p>Images courtesy of <a href="https://unsplash.com/">Unsplash</a></p>
