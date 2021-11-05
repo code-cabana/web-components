@@ -2,7 +2,7 @@ import { c, useEffect, useHost, useRef, useState } from "atomico";
 import { useEventListener, useSwipe, useOnClickOutside } from "../../lib/hooks";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { nextFrame } from "../../lib/animation";
-import { renderHtml } from "../../lib/dom";
+import { getMatrixTranslateValues, renderHtml } from "../../lib/dom";
 import { cssJoin } from "../../lib/array";
 import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
@@ -34,12 +34,12 @@ function Carousel({
   // State
   const [width, setWidth] = useState(0);
   const [slides, setSlides] = useState();
-  const [activeSlide, setActiveSlide] = useState(0);
   const [transition, setTransition] = useState(true);
   const [perPage, setPerPage] = useState(1);
-  const [position, setPosition] = useState(0);
   const [swipeStartPos, setSwipeStartPos] = useState(0);
   const [focused, setFocused] = useState(false);
+  const [position, setPosition] = useState(0);
+  const [activeSlide, setActiveSlide] = useState(0);
 
   // Builds all slides provided to the slide slot
   function buildSlides() {
@@ -99,8 +99,9 @@ function Carousel({
   }
 
   // Increments / decrements the active slide
-  function adjustActiveSlide(count) {
-    goToSlide(activeSlide + count, true);
+  async function adjustActiveSlide(count) {
+    const wrapped = await wrapSlide();
+    goToSlide(wrapped + count, true);
   }
 
   // Moves the track to display a given slide
@@ -150,24 +151,41 @@ function Carousel({
     if (!loop) return;
     const isPastLoop = position >= loopEndPos;
     const isBeforeLoop = position < loopStartPos;
-    if (isPastLoop || isBeforeLoop) console.log("Wrapping position");
     if (isPastLoop) goToPos(loopStartPos + (position - loopEndPos));
     else if (isBeforeLoop) goToPos(loopEndPos - (loopStartPos - position));
     return isPastLoop || isBeforeLoop;
   }
 
   // Wrap around to the beginning/end if looping is enabled
-  // TODO - need to do this on arrow key press not on transition end, because you can keep scrolling
-  function wrapSlide() {
+  async function wrapSlide() {
     if (!loop) return;
-    console.log(activeSlide);
     const atEnd = activeSlide >= loopEnd;
     const atStart = activeSlide <= 0;
-    if (atStart) console.log("atStart", activeSlide);
-    if (atEnd)
-      console.log("atEnd", activeSlide, loopEnd, activeSlide - loopEnd);
-    if (atEnd) goToSlide(loopStart + (activeSlide - loopEnd));
-    else if (atStart) goToSlide(loopEnd - (loopStart - activeSlide));
+    const newSlide = atEnd
+      ? loopStart + (activeSlide - loopEnd)
+      : atStart
+      ? loopEnd - (loopStart - activeSlide)
+      : activeSlide;
+    const requiresWrap = atStart || atEnd;
+    if (requiresWrap) {
+      // Need to detect amount of pixels until the loopEnd pos
+      const { transform } = window.getComputedStyle(trackRef.current);
+      const computedPosition = -1 * getMatrixTranslateValues(transform).x;
+      const delta = atEnd
+        ? loopEndPos - computedPosition
+        : atStart
+        ? computedPosition
+        : 0;
+      console.log({ getSlidePos: getSlidePos(newSlide), delta });
+      const newPos = getSlidePos(newSlide) + delta;
+      await goToPos(newPos);
+      console.log("WRAPPED");
+      await nextFrame();
+      await nextFrame();
+      await nextFrame();
+    }
+    console.log("GOIN NEXT");
+    return newSlide;
   }
 
   function onSwipeStart() {
@@ -199,8 +217,8 @@ function Carousel({
   }
 
   // Arrow key navigation
-  function onKeyDown(event) {
-    if (!focused) return;
+  async function onKeyDown(event) {
+    if (!focused || event.repeat) return;
     if (event.key === "ArrowRight") {
       adjustActiveSlide(1);
     } else if (event.key === "ArrowLeft") {
@@ -269,7 +287,6 @@ function Carousel({
         <div
           ref={trackRef}
           class={cssJoin(["track", transition && "transition"])}
-          ontransitionend={wrapSlide}
           style={{
             "--numSlides": numSlides,
             "--slideWidth": `${slideWidth}px`,
