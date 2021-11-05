@@ -1,4 +1,4 @@
-import { useRef } from "atomico";
+import { useEffect, useRef } from "atomico";
 
 // https://css-tricks.com/using-requestanimationframe-with-react-hooks/
 export default function useAnimationFrame(callback) {
