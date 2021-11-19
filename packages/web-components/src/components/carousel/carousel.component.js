@@ -3,7 +3,9 @@ import { c } from "atomico";
 function Carousel({} = {}) {
   return (
     <host shadowDom tabindex={0}>
-      <div>restart</div>
+      {[...Array(100)].map((_, i) => {
+        return <div>{i}</div>;
+      })}
     </host>
   );
 }

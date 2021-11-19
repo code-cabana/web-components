@@ -1,5 +1,5 @@
 // Based on https://github.com/rsdavis/svelte-collapse
-import { nextFrame } from "./index";
+import { nextFrame } from "./frame";
 
 export default function collapse(node, params) {
   const defaultParams = {
