@@ -38,7 +38,7 @@ $position: var(--position, 0px);
   transform: translateX($position);
 
   &.transition {
-    transition: transform var(--duration, 0.3s) var(--easing, "ease-out");
+    transition: transform var(--duration, 0.3s) var(--easing, ease-out);
   }
 }
 

@@ -1,5 +1,25 @@
-.container {
+$position: var(--position, 0px);
+
+.viewport {
+  position: relative;
+  width: var(--width, 100%);
+  height: var(--height, 100%);
+  border: 10px solid red;
+  margin: auto; //TODO delete me
 }
 
 .track {
+  display: inline-grid;
+  grid-auto-flow: column;
+  opacity: 0.5;
+  transform: translateX($position);
+  transition: transform 0.3s ease-out;
+}
+
+.item {
+  position: relative;
+  box-sizing: border-box;
+  width: var(--itemWidth);
+  height: var(--height);
+  border: 1px solid black;
 }
