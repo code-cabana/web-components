@@ -66,6 +66,11 @@ export default function useSwipe({
     return { direction, directions, distance };
   }
 
+  function resetSwipe(event) {
+    setSwipeStartPos(getPosition(event));
+    setSwipeStartTime(Date.now());
+  }
+
   const onDown = useCallback(
     (event) => {
       event.preventDefault();
@@ -88,10 +93,12 @@ export default function useSwipe({
           currentPos
         );
         if (!swiping) {
-          onSwipeStart({ swipeStartPos, swipeStartTime });
+          if (typeof onSwipeStart === "function")
+            onSwipeStart({ swipeStartPos, swipeStartTime });
           setSwiping(true);
         }
-        onSwiping({ direction, directions, distance });
+        const shouldReset = onSwiping({ direction, directions, distance });
+        if (shouldReset) resetSwipe(event);
       }
     },
     [setSwiping, onSwiping]
