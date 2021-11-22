@@ -5,9 +5,9 @@ import { clamp } from "../../lib/math";
 import styles from "./carousel.scss";
 
 function Carousel({
-  width = "400px",
+  width = "100%",
   height = "300px",
-  itemsPerPage = 5,
+  itemsPerViewport = 5,
   loop = true,
 } = {}) {
   const viewportRef = useRef();
@@ -19,8 +19,8 @@ function Carousel({
   const [animPosS, setAnimPosS] = useState(0);
   const itemWidthR = useRef();
   const [itemWidthS, setItemWidthS] = useState();
-  const targetPos = targetPosR?.current || 0;
-  const animPos = animPosR?.current || 0;
+  const targetPos = targetPosR?.current || 0; // Component position target - does not consider browser animation frames
+  const animPos = animPosR?.current || 0; // Browser position target - only updated in sync with browser animation frames
   const itemWidth = itemWidthR?.current;
 
   function setTargetPos(newPos) {
@@ -41,32 +41,36 @@ function Carousel({
   const rawItems = [...Array(10)].map((_, id) => ({ id }));
   const items = loop
     ? [
-        ...rawItems.slice(rawItems.length - itemsPerPage),
+        ...rawItems.slice(rawItems.length - itemsPerViewport),
         ...rawItems,
-        ...rawItems.slice(0, itemsPerPage),
+        ...rawItems.slice(0, itemsPerViewport),
       ]
     : rawItems;
-  const loopStart = itemsPerPage;
-  const loopEnd = items.length - itemsPerPage;
+  const loopStart = itemsPerViewport;
+  const loopEnd = items.length - itemsPerViewport;
   const clampStart = 0;
-  const clampEnd = items.length - itemsPerPage;
+  const clampEnd = items.length - itemsPerViewport;
 
   const [viewportWidth, setViewportWidth] = useState();
   const [targetItem, setTargetItem] = useState(loop ? loopStart : 0);
   const position = typeof animPos !== "undefined" ? `-${animPos}px` : "0px";
 
+  function getViewportWidth() {
+    return viewportRef?.current?.clientWidth;
+  }
+
   // Updates the viewport and item widths
   function updateDimensions() {
     if (!viewportRef?.current) return;
-    const viewportWidth = viewportRef.current.clientWidth;
-    const itemWidth = viewportWidth / itemsPerPage;
+    const viewportWidth = getViewportWidth();
+    const itemWidth = viewportWidth / itemsPerViewport;
     setViewportWidth(viewportWidth);
     setItemWidth(itemWidth);
   }
 
   function goToLoopStart() {
     if (!itemWidth) return;
-    const loopStartPos = getSlidePosition(loopStart);
+    const loopStartPos = getItemPosition(loopStart);
     setTargetPos(loopStartPos);
   }
 
@@ -78,15 +82,28 @@ function Carousel({
     const targetPos = targetPosR?.current;
     const animPos = animPosR?.current;
     const itemWidth = itemWidthR?.current;
+    const viewportWidth = getViewportWidth();
     if (!isDefined(targetPos) || !isDefined(animPos)) return;
     if (animPos === targetPos) return; // If the position hasn't changed, do nothing
 
     if (loop) {
       const loopEndPos = loopEnd * itemWidth;
-      const inWarpZone = targetPos <= clampStart || targetPos >= loopEndPos;
-      if (inWarpZone) {
-        // UP TO: need to snap back to start / end of the loop
-        setAnimPos(targetPos);
+      const inWarpStart = targetPos <= clampStart;
+      const inWarpEnd = targetPos >= loopEndPos;
+      if (inWarpStart || inWarpEnd) {
+        const startWarpToPos = (loopEnd + 1) * itemWidth - viewportWidth;
+        const endWarpToPos = (loopStart - 1) * itemWidth;
+        const warpedPos = inWarpStart ? startWarpToPos : endWarpToPos;
+        const newTargetPos =
+          warpedPos + (inWarpStart ? -1 * itemWidth : itemWidth);
+        const newTargetItem = Math.abs(Math.round(newTargetPos / itemWidth));
+        setAnimPos(warpedPos);
+        setTargetPos(newTargetPos);
+        setTargetItem(newTargetItem);
+        trackRef.current.style.transition = "none";
+        requestAnimationFrame(() => {
+          trackRef.current.style.transition = "";
+        });
       } else {
         setAnimPos(targetPos);
       }
@@ -94,6 +111,8 @@ function Carousel({
       setAnimPos(targetPos);
     }
   });
+
+  console.log("targetPos", targetPos, "targetItem", targetItem);
 
   // Arrow key navigation
   function onKeyDown(event) {
@@ -104,12 +123,12 @@ function Carousel({
 
   function adjustTargetItem(count) {
     const newItem = clamp(targetItem + count, clampStart, clampEnd);
-    const newPos = getSlidePosition(newItem);
+    const newPos = getItemPosition(newItem);
     setTargetItem(newItem);
     setTargetPos(newPos);
   }
 
-  function getSlidePosition(index) {
+  function getItemPosition(index) {
     return index * itemWidth;
   }
 
@@ -127,7 +146,6 @@ function Carousel({
             typeof itemWidth !== "undefined"
               ? `${itemWidth}px`
               : `${viewportWidth}px`,
-          "--targetPos": `${targetPos}px`,
           "--position": position,
         }}
       >
@@ -136,6 +154,7 @@ function Carousel({
             return (
               <div index={index} class="item">
                 {id}
+                <img src={`https://source.unsplash.com/random/400x300?${id}`} />
               </div>
             );
           })}

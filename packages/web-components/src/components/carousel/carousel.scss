@@ -6,12 +6,12 @@ $position: var(--position, 0px);
   height: var(--height, 100%);
   border: 10px solid red;
   margin: auto; //TODO delete me
+  overflow: hidden;
 }
 
 .track {
   display: inline-grid;
   grid-auto-flow: column;
-  opacity: 0.5;
   transform: translateX($position);
   transition: transform 0.3s ease-out;
 }
