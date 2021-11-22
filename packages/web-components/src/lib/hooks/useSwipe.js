@@ -17,6 +17,8 @@ export default function useSwipe({
   const [swiping, setSwiping] = useState(false);
   const [swipeStartPos, setSwipeStartPos] = useState();
   const [swipeStartTime, setSwipeStartTime] = useState();
+  const [swipeOrigin, setSwipeOrigin] = useState(); // Ignores resetSwipe that applies to swipeStartPos - useful for measuring total delta
+  const [swipeOriginTime, setSwipeOriginTime] = useState(); // Ignores resetSwipe that applies to swipeStartTime - useful for measuring total swipe time
 
   // Returns X/Y coordinates of an event
   function getPosition(event) {
@@ -75,8 +77,12 @@ export default function useSwipe({
     (event) => {
       event.preventDefault();
       setHeld(true);
-      setSwipeStartPos(getPosition(event));
-      setSwipeStartTime(Date.now());
+      const pos = getPosition(event);
+      const now = Date.now();
+      setSwipeOrigin(pos);
+      setSwipeStartPos(pos);
+      setSwipeStartTime(now);
+      setSwipeOriginTime(now);
     },
     [setHeld, setSwipeStartPos, setSwipeStartTime]
   );
@@ -92,12 +98,26 @@ export default function useSwipe({
           swipeStartPos,
           currentPos
         );
+        const {
+          direction: totalDirection,
+          directions: totalDirections,
+          distance: totalDistance,
+        } = getDirAndDist(swipeOrigin, currentPos);
+
         if (!swiping) {
           if (typeof onSwipeStart === "function")
             onSwipeStart({ swipeStartPos, swipeStartTime });
           setSwiping(true);
         }
-        const shouldReset = onSwiping({ direction, directions, distance });
+        const shouldReset = onSwiping({
+          direction,
+          directions,
+          distance,
+          totalDirection,
+          totalDirections,
+          totalDirections,
+          totalDistance,
+        });
         if (shouldReset) resetSwipe(event);
       }
     },
@@ -111,15 +131,32 @@ export default function useSwipe({
       if (!swiping) return;
       setSwiping(false);
 
-      const time = Date.now() - swipeStartTime;
-      if (maxTime === -1 || time <= maxTime) {
+      const now = Date.now();
+      const time = now - swipeStartTime;
+      const totalTime = now - swipeOriginTime;
+      if (maxTime === -1 || totalTime <= maxTime) {
         const swipeEndPos = getPosition(event);
         const { direction, directions, distance } = getDirAndDist(
           swipeStartPos,
           swipeEndPos
         );
+        const {
+          direction: totalDirection,
+          directions: totalDirections,
+          distance: totalDistance,
+        } = getDirAndDist(swipeOrigin, swipeEndPos);
+
         if (typeof onSwipeEnd === "function")
-          onSwipeEnd({ direction, directions, distance, time });
+          onSwipeEnd({
+            direction,
+            directions,
+            distance,
+            totalDirection,
+            totalDirections,
+            totalDistance,
+            time,
+            totalTime,
+          });
       }
     },
     [setHeld, setSwiping, onSwipeEnd]

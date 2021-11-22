@@ -1,46 +1,94 @@
-import { c, useEffect, useRef, useState } from "atomico";
+import { c, useEffect, useHost, useRef, useState } from "atomico";
+import { useSlot } from "@atomico/hooks/use-slot";
+import { getMatrixTranslateValues, renderHtml } from "../../lib/dom";
 import { useSwipe, useStateCb } from "../../lib/hooks";
-import { getMatrixTranslateValues } from "../../lib/dom";
 import { clamp } from "../../lib/math";
 import styles from "./carousel.scss";
 
+// Todo
+// Use velocity based momentum rather than time threshold
+// Resize-able
+// Navigators
+// Navigator icon
+// Flip navigators
+// Transition duration
+// Transition easing
+// Start slide
+// onChange function
+// parts styling
+
 function Carousel({
-  width = "100%",
-  height = "300px",
-  itemsPerViewport = 5,
-  loop = true,
-  swipeable = true,
+  width = "50%", // Width of the viewport
+  height = "300px", // Height of the viewport
+  itemsPerViewport: _itemsPerViewport = 5, // How many items to display per viewport width
+  loop = true, // When reaching the start or end, loop back to the beginning?
+  swipeable = true, // Dragging or swiping the carousel moves it
+  useMomentum = true, // When finishing a swipe, preserve momentum
+  momentumMultiplier = 1.5, // Drift further after ending a swipe
+  snap = true, // When completing a swipe, snap to the nearest item
+  reverse = false, // Reverse the display order of items
+  dragThreshold = 200, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+  minSwipeDistance = 50, // Minimum swipe distance required in pixels to use momentum
 } = {}) {
+  const host = useHost();
+  const slotRef = useRef();
+  const itemNodes = useSlot(slotRef);
   const viewportRef = useRef();
   const trackRef = swipeable
     ? useSwipe({ onSwipeStart, onSwiping, onSwipeEnd })
     : useRef();
 
-  const rawItems = [...Array(10)].map((_, id) => ({ id }));
-  const items = loop
-    ? [
-        ...rawItems.slice(rawItems.length - itemsPerViewport),
-        ...rawItems,
-        ...rawItems.slice(0, itemsPerViewport),
-      ]
-    : rawItems;
-  const loopStart = itemsPerViewport;
-
   const [viewportWidth, setViewportWidth] = useState();
   const [itemWidth, setItemWidth] = useState();
+  const [items, setItems] = useState([]);
   const [activeItem, setActiveItem] = useState(0);
   const [basePosition, setBasePosition] = useStateCb(0); // Position excluding swipe data
   const [swipeDelta, setSwipeDelta] = useState(0); // Pixel length of the current swipe
 
+  const itemsPerViewport = getItemsPerViewport();
+  const loopStart = itemsPerViewport;
   const trackWidth = items.length * itemWidth;
   const endEdgePos = trackWidth - viewportWidth;
   const position = clamp(basePosition + swipeDelta, 0, endEdgePos);
 
-  useEffect(updateDimensions, [viewportRef]);
-  useEffect(goToLoopStart, [itemWidth]);
+  useEffect(updateDimensions, [viewportRef, items]);
+  useEffect(buildItems, [itemNodes]);
+  useEffect(goToLoopStart, [items, itemWidth]);
 
   // Initialization
   // ---
+
+  // Builds all items provided to the items slot
+  function buildItems() {
+    if (!itemNodes || itemNodes.length <= 0) return;
+
+    const enhancedItems = itemNodes
+      .filter((el) => el instanceof Element)
+      .map(buildItem);
+
+    // If direction is right to left, flip the array
+    const itemsReversed = reverse
+      ? [...enhancedItems].reverse()
+      : enhancedItems;
+
+    // If looping is required, add the first page to the end and last page to the beginning
+    const loopedItems = loop
+      ? [
+          ...itemsReversed.slice(itemsReversed.length - itemsPerViewport),
+          ...itemsReversed,
+          ...itemsReversed.slice(0, itemsPerViewport),
+        ]
+      : itemsReversed;
+
+    setItems(loopedItems);
+  }
+
+  // Builds an individual item
+  function buildItem(itemNode) {
+    const clone = itemNode.cloneNode(true);
+    clone.setAttribute("class", "item");
+    return renderHtml(clone.outerHTML);
+  }
 
   // Updates the viewport and item widths
   function updateDimensions() {
@@ -65,6 +113,15 @@ function Carousel({
     return index * itemWidth;
   }
 
+  // Derive number of slides per page based on --perPage CSS variable or fall back to passed property
+  function getItemsPerViewport() {
+    if (!host?.current) return _itemsPerViewport;
+    const style = getComputedStyle(host.current)?.getPropertyValue("--perPage");
+    if (!style) return _itemsPerViewport;
+    const perPageNum = parseInt(style);
+    return typeof perPageNum === "number" ? perPageNum : _itemsPerViewport;
+  }
+
   // Swiping
   // ---
 
@@ -75,8 +132,8 @@ function Carousel({
   function onSwiping({ directions }) {
     const { left, right } = directions;
     const delta = left - right;
-
-    const { atEdge: needsToWrap, atEnd } = isAtEdge();
+    const { atEdge, atEnd } = isAtEdge();
+    const needsToWrap = loop && atEdge;
     if (needsToWrap) {
       setBasePosition(atEnd ? viewportWidth : endEdgePos - viewportWidth);
       setSwipeDelta(0);
@@ -84,10 +141,38 @@ function Carousel({
     return needsToWrap;
   }
 
-  function onSwipeEnd() {
+  function onSwipeEnd({
+    totalDirection,
+    directions,
+    totalDirections,
+    totalTime: time,
+  }) {
+    const { left, right } = directions;
+    const { left: totalLeft, right: totalRight } = totalDirections;
+    const delta = left - right;
+    const totalDelta = totalLeft - totalRight;
+
     trackRef.current.style.transition = "";
-    setBasePosition(clamp(basePosition + swipeDelta, 0, endEdgePos));
+
+    // Momentum
+    const hasMomentum =
+      time < dragThreshold && Math.abs(totalDelta) > minSwipeDistance;
+    const momentumOffset =
+      useMomentum && hasMomentum
+        ? clamp(
+            totalDelta * momentumMultiplier,
+            totalDirection === "right" ? -1 * viewportWidth : 0,
+            totalDirection === "right" ? 0 : viewportWidth
+          ) // Clamp between -1 viewport width or +1 viewport width, depending on travel direction
+        : 0;
+
+    const newPos = clamp(basePosition + delta + momentumOffset, 0, endEdgePos);
+    const closestItem = Math.abs(Math.round(newPos / itemWidth));
+    setActiveItem(closestItem);
     setSwipeDelta(0);
+
+    if (snap) setBasePosition(getItemPosition(closestItem));
+    else setBasePosition(newPos);
   }
 
   // Navigation
@@ -101,7 +186,7 @@ function Carousel({
   }
 
   function wrapCurrentPosition() {
-    if (!trackRef.current) return;
+    if (!loop || !trackRef.current) return;
     const { atEdge, atEnd } = isAtEdge();
     if (!atEdge) return;
 
@@ -160,7 +245,7 @@ function Carousel({
   }
 
   function onKeyDown(event) {
-    if (event.repeat) return;
+    if (event.repeat && loop) return;
     if (event.key === "ArrowRight") adjustActiveItem(1);
     else if (event.key === "ArrowLeft") adjustActiveItem(-1);
   }
@@ -175,22 +260,16 @@ function Carousel({
         style={{
           "--width": width,
           "--height": height,
+          "--position": `-${position}px`,
           "--itemWidth":
             typeof itemWidth !== "undefined"
               ? `${itemWidth}px`
               : `${viewportWidth}px`,
-          "--position": `-${position}px`,
         }}
       >
         <div class="track" ref={trackRef}>
-          {items.map(({ id }, index) => {
-            return (
-              <div index={index} class="item">
-                {id}
-                <img src={`https://source.unsplash.com/random/400x400?${id}`} />
-              </div>
-            );
-          })}
+          <slot ref={slotRef} name="item" />
+          {items}
         </div>
       </div>
       <style>{styles}</style>

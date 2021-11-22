@@ -4,9 +4,11 @@ $position: var(--position, 0px);
   position: relative;
   width: var(--width, 100%);
   height: var(--height, 100%);
-  border: 10px solid red;
-  margin: auto; //TODO delete me
-  // overflow: hidden;
+  overflow: hidden;
+
+  // Debugging
+  // border: 10px solid red;
+  // margin: auto;
 }
 
 .track {
@@ -16,10 +18,18 @@ $position: var(--position, 0px);
   transition: transform 0.3s ease-out;
 }
 
+.track *[slot="slide"],
+::slotted(*),
 .item {
   position: relative;
+  display: inline-block;
   box-sizing: border-box;
   width: var(--itemWidth);
   height: var(--height);
+  object-fit: cover;
   border: 1px solid black;
+}
+
+slot {
+  display: none;
 }
