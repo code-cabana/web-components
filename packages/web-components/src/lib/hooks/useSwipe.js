@@ -63,7 +63,7 @@ export default function useSwipe({
     const direction = sort(directions)[0];
     const distance = directions[direction];
 
-    return { direction, distance };
+    return { direction, directions, distance };
   }
 
   const onDown = useCallback(
@@ -83,7 +83,7 @@ export default function useSwipe({
 
       if (typeof onSwiping === "function") {
         const currentPos = getPosition(event);
-        const { direction, distance } = getDirAndDist(
+        const { direction, directions, distance } = getDirAndDist(
           swipeStartPos,
           currentPos
         );
@@ -91,7 +91,7 @@ export default function useSwipe({
           onSwipeStart({ swipeStartPos, swipeStartTime });
           setSwiping(true);
         }
-        onSwiping({ direction, distance });
+        onSwiping({ direction, directions, distance });
       }
     },
     [setSwiping, onSwiping]
@@ -107,12 +107,12 @@ export default function useSwipe({
       const time = Date.now() - swipeStartTime;
       if (maxTime === -1 || time <= maxTime) {
         const swipeEndPos = getPosition(event);
-        const { direction, distance } = getDirAndDist(
+        const { direction, directions, distance } = getDirAndDist(
           swipeStartPos,
           swipeEndPos
         );
         if (typeof onSwipeEnd === "function")
-          onSwipeEnd({ direction, distance, time });
+          onSwipeEnd({ direction, directions, distance, time });
       }
     },
     [setHeld, setSwiping, onSwipeEnd]

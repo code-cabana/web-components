@@ -1,17 +1,23 @@
 import { c, useEffect, useRef, useState } from "atomico";
-import { useAnimationFrame } from "../../lib/hooks";
+import { useAnimationFrame, useSwipe } from "../../lib/hooks";
 import { isDefined } from "../../lib/array";
 import { clamp } from "../../lib/math";
 import styles from "./carousel.scss";
 
 function Carousel({
-  width = "100%",
+  width = "50%",
   height = "300px",
-  itemsPerViewport = 5,
+  itemsPerViewport = 2,
   loop = true,
+  swipeable = true,
 } = {}) {
   const viewportRef = useRef();
-  const trackRef = useRef();
+  const trackRef = swipeable
+    ? useSwipe({ onSwipeStart, onSwiping, onSwipeEnd })
+    : useRef();
+
+  const swipeDeltaR = useRef(0);
+  const [swipeDeltaS, setSwipeDeltaS] = useState(0);
 
   const targetPosR = useRef(0);
   const [targetPosS, setTargetPosS] = useState(0);
@@ -21,7 +27,13 @@ function Carousel({
   const [itemWidthS, setItemWidthS] = useState();
   const targetPos = targetPosR?.current || 0; // Component position target - does not consider browser animation frames
   const animPos = animPosR?.current || 0; // Browser position target - only updated in sync with browser animation frames
+  const swipeDelta = swipeDeltaR?.current || 0;
   const itemWidth = itemWidthR?.current;
+
+  function setSwipeDelta(newDelta) {
+    swipeDeltaR.current = newDelta;
+    setSwipeDeltaS(newDelta);
+  }
 
   function setTargetPos(newPos) {
     targetPosR.current = newPos;
@@ -82,37 +94,54 @@ function Carousel({
     const targetPos = targetPosR?.current;
     const animPos = animPosR?.current;
     const itemWidth = itemWidthR?.current;
+    const swipeDelta = swipeDeltaR?.current;
     const viewportWidth = getViewportWidth();
-    if (!isDefined(targetPos) || !isDefined(animPos)) return;
-    if (animPos === targetPos) return; // If the position hasn't changed, do nothing
+    if (!isDefined(targetPos) || !isDefined(animPos) || !isDefined(swipeDelta))
+      return;
+    const desiredPos = targetPos + swipeDelta;
+    if (animPos === desiredPos) return; // If the position hasn't changed, do nothing
 
-    if (loop) {
-      const loopEndPos = loopEnd * itemWidth;
-      const inWarpStart = targetPos <= clampStart;
-      const inWarpEnd = targetPos >= loopEndPos;
-      if (inWarpStart || inWarpEnd) {
-        const startWarpToPos = (loopEnd + 1) * itemWidth - viewportWidth;
-        const endWarpToPos = (loopStart - 1) * itemWidth;
-        const warpedPos = inWarpStart ? startWarpToPos : endWarpToPos;
-        const newTargetPos =
-          warpedPos + (inWarpStart ? -1 * itemWidth : itemWidth);
-        const newTargetItem = Math.abs(Math.round(newTargetPos / itemWidth));
-        setAnimPos(warpedPos);
-        setTargetPos(newTargetPos);
-        setTargetItem(newTargetItem);
-        trackRef.current.style.transition = "none";
+    const loopEndPos = loopEnd * itemWidth;
+    const inWarpStart = desiredPos <= clampStart;
+    const inWarpEnd = desiredPos >= loopEndPos;
+
+    if (loop && (inWarpStart || inWarpEnd)) {
+      const startWarpToPos = (loopEnd + 1) * itemWidth - viewportWidth;
+      const endWarpToPos = (loopStart - 1) * itemWidth;
+      const currentPos = inWarpStart ? startWarpToPos : endWarpToPos;
+      const newTargetPos =
+        currentPos + (inWarpStart ? -1 * itemWidth : itemWidth);
+      const newTargetItem = Math.abs(Math.round(newTargetPos / itemWidth));
+      setAnimPos(currentPos);
+      setTargetPos(newTargetPos);
+      setTargetItem(newTargetItem);
+      trackRef.current.style.transition = "none";
+      requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           trackRef.current.style.transition = "";
         });
-      } else {
-        setAnimPos(targetPos);
-      }
+      });
     } else {
-      setAnimPos(targetPos);
+      setAnimPos(desiredPos + swipeDelta);
     }
   });
 
-  console.log("targetPos", targetPos, "targetItem", targetItem);
+  function onSwipeStart() {
+    // console.log("swipe start")
+  }
+
+  function onSwiping({ directions }) {
+    const { left, right } = directions;
+    const delta = left - right;
+    setSwipeDelta(delta);
+  }
+
+  function onSwipeEnd() {
+    setSwipeDelta(0);
+    setTargetPos(animPos + swipeDelta);
+    console.log(itemWidth, targetPos, animPos, targetPos + swipeDelta);
+    // console.log("Swipe end", targetPos);
+  }
 
   // Arrow key navigation
   function onKeyDown(event) {
@@ -147,6 +176,7 @@ function Carousel({
               ? `${itemWidth}px`
               : `${viewportWidth}px`,
           "--position": position,
+          "--swipeDelta": `${swipeDelta}px`,
         }}
       >
         <div class="track" ref={trackRef}>
@@ -154,7 +184,7 @@ function Carousel({
             return (
               <div index={index} class="item">
                 {id}
-                <img src={`https://source.unsplash.com/random/400x300?${id}`} />
+                <img src={`https://source.unsplash.com/random/200x400?${id}`} />
               </div>
             );
           })}
