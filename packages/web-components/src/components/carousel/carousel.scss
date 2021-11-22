@@ -13,7 +13,7 @@ $position: var(--position, 0px);
   display: inline-grid;
   grid-auto-flow: column;
   transform: translateX($position);
-  transition: transform 1s ease-out;
+  transition: transform 0.3s ease-out;
 }
 
 .item {
