@@ -1,6 +1,6 @@
 <p>Some stuff before the carousel</p>
 <hr />
-<codecabana-carousel items-per-viewport="5">
+<codecabana-carousel>
   <img slot="item" src="https://source.unsplash.com/5eThdzpVqyE/100x100" alt="start" />
   <img slot="item" src="https://via.placeholder.com/100x100?1" alt="1" />
   <img slot="item" src="https://via.placeholder.com/100x100" alt="2" />
@@ -17,17 +17,19 @@
 <style>
   /* 
     Parts
-      codecabana-carousel::part(container)
-      codecabana-carousel::part(overlay)
-      codecabana-carousel::part(slides)
+      codecabana-carousel::part(viewport)
+      codecabana-carousel::part(track)
       codecabana-carousel::part(navigators)
       codecabana-carousel::part(navigator)
       codecabana-carousel::part(previous)
       codecabana-carousel::part(next)
+      codecabana-carousel::part(item)
   */
 
-
-  /* codecabana-carousel::part(container) {
+  /* codecabana-carousel,
+  codecabana-carousel::part(viewport),
+  codecabana-carousel::part(track),
+  codecabana-carousel::part(item) {
     height: 200px;
   } */
 </style>

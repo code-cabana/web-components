@@ -7,30 +7,25 @@ import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
-// Todo
-// Check that media queries --itemsPerViewport works
-// Use velocity based momentum rather than time threshold
-// parts styling
-
 function Carousel(props = {}) {
   const {
-    width = "50%", // Width of the viewport
-    height = "300px", // Height of the viewport
-    itemsPerViewport: _itemsPerViewport = 5, // How many items to display per viewport width
-    startItem: _startItem = 0, // Item to show on page load
-    loop = true, // When reaching the start or end, loop back to the beginning?
-    swipeable = true, // Dragging or swiping the carousel moves it
-    useMomentum = true, // When finishing a swipe, preserve momentum
-    momentumMultiplier = 1.5, // Drift further after ending a swipe
-    snap = true, // When completing a swipe, snap to the nearest item
-    reverse = false, // Reverse the display order of items
-    dragThreshold = 200, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
-    minSwipeDistance = 50, // Minimum swipe distance required in pixels to use momentum
-    icon = "https://unpkg.com/@codecabana/assets@latest/img/arrow.png", // Image used for navigator buttons
-    flipNav = false, // Reverse the direction of the navigator buttons
-    duration = 300, // Transition duration in millis
-    easing = "ease-out", // Transition easing
-    onChange = () => {}, // Called when the current item changes
+    width, // Width of the viewport
+    height, // Height of the viewport
+    itemsPerViewport: _itemsPerViewport, // How many items to display per viewport width
+    startItem: _startItem, // Item to show on page load
+    loop, // When reaching the start or end, loop back to the beginning?
+    swipeable, // Dragging or swiping the carousel moves it
+    useMomentum, // When finishing a swipe, preserve momentum
+    momentumMultiplier, // Drift further after ending a swipe
+    snap, // When completing a swipe, snap to the nearest item
+    reverse, // Reverse the display order of items
+    dragThreshold, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    minSwipeDistance, // Minimum swipe distance required in pixels to use momentum
+    icon, // Image used for navigator buttons
+    flipNav, // Reverse the direction of the navigator buttons
+    duration, // Transition duration in millis
+    easing, // Transition easing
+    onChange, // Called when the current item changes
   } = props;
   const allProps = Object.values(props);
 
@@ -96,6 +91,7 @@ function Carousel(props = {}) {
   function buildItem(itemNode) {
     const clone = itemNode.cloneNode(true);
     clone.setAttribute("class", "item");
+    clone.setAttribute("part", "item");
     return renderHtml(clone.outerHTML);
   }
 
@@ -276,6 +272,7 @@ function Carousel(props = {}) {
     <host shadowDom tabindex={0} onclick={onClick} onkeydown={onKeyDown}>
       <div
         class={cssJoin(["viewport", swipeable && "swipeable"])}
+        part="viewport"
         ref={viewportRef}
         style={{
           "--width": width,
@@ -289,7 +286,7 @@ function Carousel(props = {}) {
               : `${viewportWidth}px`,
         }}
       >
-        <div class="track" ref={trackRef}>
+        <div class="track" part="track" ref={trackRef}>
           <slot ref={slotRef} name="item" />
           {items}
         </div>
