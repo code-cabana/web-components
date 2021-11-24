@@ -55,3 +55,19 @@ export function htmlCollectionToString(collection) {
 export function renderHtml(htmlString) {
   return html([htmlString]);
 }
+
+// Extracts translation values from a CSS matrix string
+export function getMatrixTranslateValues(matrixString) {
+  const matrixType = matrixString.includes("3d") ? "3d" : "2d";
+  const matrixValues = matrixString.match(/matrix.*\((.+)\)/)[1].split(", ");
+  return matrixType === "2d"
+    ? { x: matrixValues[4], y: matrixValues[5], matrixType }
+    : matrixType === "3d"
+    ? {
+        x: matrixValues[12],
+        y: matrixValues[13],
+        z: matrixValues[14],
+        matrixType,
+      }
+    : {};
+}

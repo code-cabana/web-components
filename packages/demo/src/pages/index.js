@@ -16,7 +16,7 @@ export default function Home({ components }) {
   );
 }
 
-export async function getStaticProps(context) {
+export async function getStaticProps() {
   const components = await getComponentList();
   return {
     props: { components },

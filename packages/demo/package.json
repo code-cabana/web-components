@@ -2,7 +2,7 @@
   "name": "demo",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next-remote-watch ./public/dist",
     "export": "next build && next export -o dist",
     "start": "serve dist -p 3000",
     "lint": "next lint"
@@ -20,6 +20,7 @@
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.1",
     "html-loader": "^3.0.0",
+    "next-remote-watch": "^1.0.0",
     "sass": "^1.43.4",
     "serve": "12.0.1"
   },

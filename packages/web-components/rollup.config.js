@@ -1,4 +1,4 @@
-import glob from "tiny-glob";
+import glob from "fast-glob";
 import { terser } from "rollup-plugin-terser";
 import { babel } from "@rollup/plugin-babel";
 import resolve from "@rollup/plugin-node-resolve";
@@ -8,9 +8,10 @@ import scss from "rollup-plugin-scss";
 const production = !process.env.ROLLUP_WATCH;
 const formats = ["iife", "umd", "es"];
 const targetProject = production ? "." : "../demo/public";
-const components = await glob("src/components/**/*.component.js").then(
-  (paths) => paths.map((path) => path.match(/.*[\\\/](.*?).component.js/)[1])
-);
+
+const components = glob
+  .sync(["src/components/**/*.component.js"])
+  .map((path) => path.match(/.*[\\\/](.*?).component.js/)[1]);
 
 export default components.map((component) => ({
   input: `src/components/${component}/${component}.component.js`,
@@ -26,9 +27,9 @@ export default components.map((component) => ({
       dedupe: ["atomico"],
     }),
     scss({ output: false }),
-    babel(),
+    babel({ babelHelpers: "bundled" }),
     commonjs(),
-    terser(),
+    production && terser(),
   ],
   watch: {
     clearScreen: false,
