@@ -8,7 +8,9 @@ export default function Home({ components }) {
       <ul>
         {components.map((component, index) => (
           <li key={index}>
-            <a href={`/components/${component}`}>{component}</a>
+            {component} &middot;{" "}
+            <a href={`/components/static/${component}`}>static</a> &middot;{" "}
+            <a href={`/components/module/${component}`}>module</a>
           </li>
         ))}
       </ul>

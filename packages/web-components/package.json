@@ -1,7 +1,7 @@
 {
   "name": "@codecabana/web-components",
   "version": "0.0.12",
-  "main": "index.js",
+  "main": "dist/index.js",
   "author": "code-cabana",
   "license": "MIT",
   "description": "Web components designed to infiltrate no-code platforms via script tags",
@@ -10,7 +10,7 @@
     "dev": "rollup -c -w",
     "build": "rollup -c",
     "test": "run-s size",
-    "size": "bundlewatch --config .bundlewatch.config.json",
+    "size": "bundlewatch --config .bundlewatch.config.js",
     "clean": "shx rm -rf dist",
     "prepare:readme": "shx cp ../../README.md ./",
     "prepare": "run-s clean build prepare:readme test"

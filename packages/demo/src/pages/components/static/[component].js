@@ -1,7 +1,7 @@
-import { getComponentList } from "../../lib/data";
-import { renderHtml } from "../../lib/dom";
-import getSnippet from "../../snippets";
-import MainLayout from "../../layouts/main";
+import { getComponentList } from "../../../lib/data";
+import { renderHtml } from "../../../lib/dom";
+import getSnippet from "../../../snippets";
+import MainLayout from "../../../layouts/main";
 import capitalize from "lodash.capitalize";
 import Script from "next/script";
 

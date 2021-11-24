@@ -1,9 +1,0 @@
-{
-  "files": [
-    {
-      "path": "dist/**/*.js",
-      "maxSize": "20kB",
-      "compression": "none"
-    }
-  ]
-}

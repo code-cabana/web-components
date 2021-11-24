@@ -13,14 +13,7 @@ const components = glob
   .sync(["src/components/**/*.component.js"])
   .map((path) => path.match(/.*[\\\/](.*?).component.js/)[1]);
 
-export default components.map((component) => ({
-  input: `src/components/${component}/${component}.component.js`,
-  output: formats.map((format) => ({
-    name: component,
-    file: `${targetProject}/dist/${format}/${component}.js`,
-    format,
-    assetFileNames: "[name][extname]",
-  })),
+const commonConfig = {
   plugins: [
     resolve({
       browser: true,
@@ -29,9 +22,28 @@ export default components.map((component) => ({
     scss({ output: false }),
     babel({ babelHelpers: "bundled" }),
     commonjs(),
-    production && terser(),
+    // production && terser(),
   ],
-  watch: {
-    clearScreen: false,
-  },
+  watch: { clearScreen: false },
+};
+
+const componentConfigs = components.map((component) => ({
+  ...commonConfig,
+  input: `src/components/${component}/${component}.component.js`,
+  output: formats.map((format) => ({
+    name: component,
+    file: `${targetProject}/dist/${format}/${component}.js`,
+    format,
+    assetFileNames: "[name][extname]",
+  })),
 }));
+
+const rootModuleConfig = {
+  ...commonConfig,
+  input: "src/index.js",
+  output: {
+    file: `${targetProject}/dist/index.js`,
+  },
+};
+
+export default [rootModuleConfig, ...componentConfigs];

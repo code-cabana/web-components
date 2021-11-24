@@ -7,7 +7,7 @@ import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
-function Carousel(props = {}) {
+export default function Carousel(props = {}) {
   const {
     width, // Width of the viewport
     height, // Height of the viewport

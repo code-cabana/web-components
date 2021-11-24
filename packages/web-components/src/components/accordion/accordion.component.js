@@ -9,7 +9,7 @@ import {
 } from "../../lib/dom";
 import styles from "./accordion.scss";
 
-function Accordion() {
+export default function Accordion() {
   const host = useHost();
   const [id] = useProp("id");
   const [dbug] = useProp("debug");
@@ -67,10 +67,11 @@ function Accordion() {
   }
 
   useEffect(() => {
+    if (!document) return;
     init();
     document.addEventListener("DOMContentLoaded", () => init);
     document.addEventListener("pageChange", () => init);
-  }, []);
+  }, [document]);
 
   const valid = items.length > 0;
   return valid ? (
