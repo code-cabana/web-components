@@ -5,6 +5,7 @@
   "author": "lokimckay",
   "license": "MIT",
   "description": "Web components designed to infiltrate no-code platforms via script tags",
+  "homepage": "https://codecabana.com.au",
   "scripts": {
     "dev": "rollup -c -w",
     "build": "rollup -c",
@@ -37,5 +38,9 @@
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-cabana/web-components.git"
   }
 }
