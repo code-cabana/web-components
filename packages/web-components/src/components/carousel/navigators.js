@@ -2,8 +2,8 @@ import { cssJoin } from "../../lib/array";
 
 export default function Navigators({
   icon,
-  flipnav,
-  adjustActiveSlide,
+  flipNav,
+  adjustActiveItem,
   atStart,
   atEnd,
 }) {
@@ -11,12 +11,10 @@ export default function Navigators({
     <div className="navigators" part="navigators">
       <button
         tabindex={-1}
-        onclick={() => {
-          adjustActiveSlide(-1);
-        }}
+        onclick={() => adjustActiveItem(-1)}
         className={cssJoin([
           "previous",
-          flipnav && "flip",
+          flipNav && "flip",
           atStart && "disabled",
         ])}
         part="previous navigator"
@@ -25,10 +23,8 @@ export default function Navigators({
       </button>
       <button
         tabindex={-1}
-        onclick={() => {
-          adjustActiveSlide(1);
-        }}
-        className={cssJoin(["next", !flipnav && "flip", atEnd && "disabled"])}
+        onclick={() => adjustActiveItem(1)}
+        className={cssJoin(["next", !flipNav && "flip", atEnd && "disabled"])}
         part="next navigator"
       >
         <img alt="next" src={icon} />

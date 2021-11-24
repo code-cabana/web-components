@@ -2,24 +2,20 @@ import { c, useEffect, useHost, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { getMatrixTranslateValues, renderHtml } from "../../lib/dom";
 import { useSwipe, useStateCb, useEventListener } from "../../lib/hooks";
+import { cssJoin } from "../../lib/array";
 import { clamp } from "../../lib/math";
+import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
 // Todo
 // Use velocity based momentum rather than time threshold
-// Navigators
-// Navigator icon
-// Flip navigators
-// Transition duration
-// Transition easing
-// Start slide
-// onChange function
 // parts styling
 
 function Carousel({
   width = "50%", // Width of the viewport
   height = "300px", // Height of the viewport
   itemsPerViewport: _itemsPerViewport = 5, // How many items to display per viewport width
+  startItem: _startItem = 0, // Item to show on page load
   loop = true, // When reaching the start or end, loop back to the beginning?
   swipeable = true, // Dragging or swiping the carousel moves it
   useMomentum = true, // When finishing a swipe, preserve momentum
@@ -28,6 +24,11 @@ function Carousel({
   reverse = false, // Reverse the display order of items
   dragThreshold = 200, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
   minSwipeDistance = 50, // Minimum swipe distance required in pixels to use momentum
+  icon = "https://unpkg.com/@codecabana/assets@latest/img/arrow.png", // Image used for navigator buttons
+  flipNav = false, // Reverse the direction of the navigator buttons
+  duration = 300, // Transition duration in millis
+  easing = "ease-out", // Transition easing
+  onChange = () => {}, // Called when the current item changes
 } = {}) {
   const host = useHost();
   const slotRef = useRef();
@@ -50,9 +51,13 @@ function Carousel({
   const endEdgePos = trackWidth - viewportWidth;
   const position = clamp(basePosition + swipeDelta, 0, endEdgePos);
 
+  const atStart = !loop && activeItem === 0;
+  const atEnd = !loop && activeItem === items.length - itemsPerViewport;
+
   useEffect(updateDimensions, [viewportRef, items]);
   useEffect(buildItems, [itemNodes]);
-  useEffect(goToLoopStart, [items, itemWidth]);
+  useEffect(goToStartItem, [items, itemWidth]);
+  useEffect(onChange, [activeItem]);
   useEventListener("resize", onResize, window);
 
   // Initialization
@@ -99,11 +104,12 @@ function Carousel({
     setItemWidth(itemWidth);
   }
 
-  function goToLoopStart() {
-    if (!itemWidth || !loop) return;
-    const loopStartPos = getItemPosition(loopStart);
-    setBasePosition(loopStartPos);
-    setActiveItem(loopStart);
+  function goToStartItem() {
+    if (!itemWidth) return;
+    const startItem = loop ? loopStart + _startItem : _startItem;
+    const startItemPos = getItemPosition(startItem);
+    setBasePosition(startItemPos);
+    setActiveItem(startItem);
   }
 
   function onResize() {
@@ -248,6 +254,11 @@ function Carousel({
     }
   }
 
+  function onClick() {
+    if (!host?.current) return;
+    host.current.focus();
+  }
+
   function onKeyDown(event) {
     if (event.repeat && loop) return;
     if (event.key === "ArrowRight") adjustActiveItem(1);
@@ -255,16 +266,16 @@ function Carousel({
   }
 
   return (
-    <host shadowDom>
+    <host shadowDom tabindex={0} onclick={onClick} onkeydown={onKeyDown}>
       <div
-        class="viewport"
+        class={cssJoin(["viewport", swipeable && "swipeable"])}
         ref={viewportRef}
-        tabindex={0}
-        onkeydown={onKeyDown}
         style={{
           "--width": width,
           "--height": height,
           "--position": `-${position}px`,
+          "--duration": `${duration / 1000}s`,
+          "--easing": easing,
           "--itemWidth":
             typeof itemWidth !== "undefined"
               ? `${itemWidth}px`
@@ -275,6 +286,7 @@ function Carousel({
           <slot ref={slotRef} name="item" />
           {items}
         </div>
+        {Navigators({ adjustActiveItem, icon, flipNav, atStart, atEnd })}
       </div>
       <style>{styles}</style>
     </host>
