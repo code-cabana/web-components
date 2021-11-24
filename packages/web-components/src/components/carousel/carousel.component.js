@@ -1,13 +1,12 @@
 import { c, useEffect, useHost, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { getMatrixTranslateValues, renderHtml } from "../../lib/dom";
-import { useSwipe, useStateCb } from "../../lib/hooks";
+import { useSwipe, useStateCb, useEventListener } from "../../lib/hooks";
 import { clamp } from "../../lib/math";
 import styles from "./carousel.scss";
 
 // Todo
 // Use velocity based momentum rather than time threshold
-// Resize-able
 // Navigators
 // Navigator icon
 // Flip navigators
@@ -54,6 +53,7 @@ function Carousel({
   useEffect(updateDimensions, [viewportRef, items]);
   useEffect(buildItems, [itemNodes]);
   useEffect(goToLoopStart, [items, itemWidth]);
+  useEventListener("resize", onResize, window);
 
   // Initialization
   // ---
@@ -104,6 +104,10 @@ function Carousel({
     const loopStartPos = getItemPosition(loopStart);
     setBasePosition(loopStartPos);
     setActiveItem(loopStart);
+  }
+
+  function onResize() {
+    updateDimensions();
   }
 
   // Getters
