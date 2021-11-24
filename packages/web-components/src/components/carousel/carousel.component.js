@@ -8,28 +8,32 @@ import Navigators from "./navigators";
 import styles from "./carousel.scss";
 
 // Todo
+// Check that media queries --itemsPerViewport works
 // Use velocity based momentum rather than time threshold
 // parts styling
 
-function Carousel({
-  width = "50%", // Width of the viewport
-  height = "300px", // Height of the viewport
-  itemsPerViewport: _itemsPerViewport = 5, // How many items to display per viewport width
-  startItem: _startItem = 0, // Item to show on page load
-  loop = true, // When reaching the start or end, loop back to the beginning?
-  swipeable = true, // Dragging or swiping the carousel moves it
-  useMomentum = true, // When finishing a swipe, preserve momentum
-  momentumMultiplier = 1.5, // Drift further after ending a swipe
-  snap = true, // When completing a swipe, snap to the nearest item
-  reverse = false, // Reverse the display order of items
-  dragThreshold = 200, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
-  minSwipeDistance = 50, // Minimum swipe distance required in pixels to use momentum
-  icon = "https://unpkg.com/@codecabana/assets@latest/img/arrow.png", // Image used for navigator buttons
-  flipNav = false, // Reverse the direction of the navigator buttons
-  duration = 300, // Transition duration in millis
-  easing = "ease-out", // Transition easing
-  onChange = () => {}, // Called when the current item changes
-} = {}) {
+function Carousel(props = {}) {
+  const {
+    width = "50%", // Width of the viewport
+    height = "300px", // Height of the viewport
+    itemsPerViewport: _itemsPerViewport = 5, // How many items to display per viewport width
+    startItem: _startItem = 0, // Item to show on page load
+    loop = true, // When reaching the start or end, loop back to the beginning?
+    swipeable = true, // Dragging or swiping the carousel moves it
+    useMomentum = true, // When finishing a swipe, preserve momentum
+    momentumMultiplier = 1.5, // Drift further after ending a swipe
+    snap = true, // When completing a swipe, snap to the nearest item
+    reverse = false, // Reverse the display order of items
+    dragThreshold = 200, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    minSwipeDistance = 50, // Minimum swipe distance required in pixels to use momentum
+    icon = "https://unpkg.com/@codecabana/assets@latest/img/arrow.png", // Image used for navigator buttons
+    flipNav = false, // Reverse the direction of the navigator buttons
+    duration = 300, // Transition duration in millis
+    easing = "ease-out", // Transition easing
+    onChange = () => {}, // Called when the current item changes
+  } = props;
+  const allProps = Object.values(props);
+
   const host = useHost();
   const slotRef = useRef();
   const itemNodes = useSlot(slotRef);
@@ -41,11 +45,11 @@ function Carousel({
   const [viewportWidth, setViewportWidth] = useState();
   const [itemWidth, setItemWidth] = useState();
   const [items, setItems] = useState([]);
+  const [itemsPerViewport, setItemsPerViewport] = useState(1);
   const [activeItem, setActiveItem] = useState(0);
   const [basePosition, setBasePosition] = useStateCb(0); // Position excluding swipe data
   const [swipeDelta, setSwipeDelta] = useState(0); // Pixel length of the current swipe
 
-  const itemsPerViewport = getItemsPerViewport();
   const loopStart = itemsPerViewport;
   const trackWidth = items.length * itemWidth;
   const endEdgePos = trackWidth - viewportWidth;
@@ -54,8 +58,8 @@ function Carousel({
   const atStart = !loop && activeItem === 0;
   const atEnd = !loop && activeItem === items.length - itemsPerViewport;
 
-  useEffect(updateDimensions, [viewportRef, items]);
-  useEffect(buildItems, [itemNodes]);
+  useEffect(updateDimensions, [...allProps, viewportRef, items]);
+  useEffect(buildItems, [itemNodes, itemsPerViewport]);
   useEffect(goToStartItem, [items, itemWidth]);
   useEffect(onChange, [activeItem]);
   useEventListener("resize", onResize, window);
@@ -102,6 +106,7 @@ function Carousel({
     const itemWidth = viewportWidth / itemsPerViewport;
     setViewportWidth(viewportWidth);
     setItemWidth(itemWidth);
+    setItemsPerViewport(getItemsPerViewport());
   }
 
   function goToStartItem() {
@@ -126,7 +131,9 @@ function Carousel({
   // Derive number of slides per page based on --perPage CSS variable or fall back to passed property
   function getItemsPerViewport() {
     if (!host?.current) return _itemsPerViewport;
-    const style = getComputedStyle(host.current)?.getPropertyValue("--perPage");
+    const style = getComputedStyle(host.current)?.getPropertyValue(
+      "--itemsPerViewport"
+    );
     if (!style) return _itemsPerViewport;
     const perPageNum = parseInt(style);
     return typeof perPageNum === "number" ? perPageNum : _itemsPerViewport;
@@ -189,8 +196,8 @@ function Carousel({
   // ---
 
   function isAtEdge() {
-    const atStart = position <= 0;
-    const atEnd = position >= endEdgePos;
+    const atStart = parseInt(position) <= 0;
+    const atEnd = parseInt(position) >= parseInt(endEdgePos);
     const atEdge = atStart || atEnd;
     return { atEdge, atStart, atEnd };
   }
@@ -293,6 +300,75 @@ function Carousel({
   );
 }
 
-Carousel.props = {};
+Carousel.props = {
+  width: {
+    type: String, // Width of the carousel viewport
+    value: "100%",
+  },
+  height: {
+    type: String, // Height of the carousel viewport
+    value: "600px",
+  },
+  itemsPerViewport: {
+    type: Number, // How many items to display per viewport width
+    value: 3,
+  },
+  startItem: {
+    type: Number, // Item to show on page load
+    value: 0,
+  },
+  loop: {
+    type: Boolean, // When reaching the start or end, loop back to the beginning?
+    value: true,
+  },
+  swipeable: {
+    type: Boolean, // Dragging or swiping the carousel moves it
+    value: true,
+  },
+  useMomentum: {
+    type: Boolean, // When finishing a swipe, preserve momentum
+    value: true,
+  },
+  momentumMultiplier: {
+    type: Number, // Drift further after ending a swipe
+    value: 1.5,
+  },
+  snap: {
+    type: Boolean, // When completing a swipe, snap to the nearest item
+    value: true,
+  },
+  reverse: {
+    type: Boolean, // Reverse the display order of items
+    value: false,
+  },
+  dragThreshold: {
+    type: Number, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    value: 200,
+  },
+  minSwipeDistance: {
+    type: Number, // Minimum swipe distance required in pixels to use momentum
+    value: 50,
+  },
+  icon: {
+    type: String, // Image used for navigator buttons
+    value: "https://unpkg.com/@codecabana/assets@latest/img/arrow.png",
+  },
+  flipNav: {
+    type: Boolean, // Reverse the direction of the navigator buttons
+    value: false,
+  },
+  duration: {
+    type: Number, // Transition duration in millis
+    value: 300,
+  },
+  easing: {
+    type: String, // Transition easing - https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
+    value: "ease-out",
+  },
+  onChange: {
+    type: Function, // Called when the current item changes
+    value: () => {},
+  },
+};
 
 customElements.define("codecabana-carousel", c(Carousel));
