@@ -10,7 +10,7 @@ Web components designed to infiltrate no-code platforms via script tags
 
 ### `<script>` tag
 
-For usage via `<script>` tags in no/low-code platforms like Wordpress, Squarespace, Wix, Webflow etc, refer to [codecabana.com.au]
+For usage via `<script>` tags in no/low-code platforms like Wordpress, Squarespace, Wix, Webflow etc, refer to [codecabana.com.au](https://www.codecabana.com.au)
 
 ### ES Module
 
