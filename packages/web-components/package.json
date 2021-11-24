@@ -2,7 +2,7 @@
   "name": "@codecabana/web-components",
   "version": "0.0.12",
   "main": "index.js",
-  "author": "lokimckay",
+  "author": "code-cabana",
   "license": "MIT",
   "description": "Web components designed to infiltrate no-code platforms via script tags",
   "homepage": "https://codecabana.com.au",
