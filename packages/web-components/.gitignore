@@ -1,2 +1,5 @@
 node_modules
 dist
+
+# README is copied from root directory on publish
+README.md

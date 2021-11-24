@@ -11,7 +11,8 @@
     "test": "run-s size",
     "size": "bundlewatch --config .bundlewatch.config.json",
     "clean": "shx rm -rf dist",
-    "prepare": "run-s clean build test"
+    "prepare:readme": "shx cp ../../README.md ./",
+    "prepare": "run-s clean build prepare:readme test"
   },
   "devDependencies": {
     "@atomico/hooks": "^3.20.2",

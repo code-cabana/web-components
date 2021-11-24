@@ -8,18 +8,14 @@ Web components designed to infiltrate no-code platforms via script tags
 
 ## Usage
 
-```html
-<script
-  type="module"
-  src="https://unpkg.com/@codecabana/web-components@<VERSION>/dist/es/<COMPONENT>.js"
-></script>
-<!-- OR -->
-<script src="https://unpkg.com/@codecabana/web-components@<VERSION>/dist/umd/<COMPONENT>.js"></script>
-<!-- OR -->
-<script
-  defer
-  src="https://unpkg.com/@codecabana/web-components@<VERSION>/dist/iife/<COMPONENT>.js"
-></script>
+### `<script>` tag
+
+For usage via `<script>` tags in no/low-code platforms like Wordpress, Squarespace, Wix, Webflow etc, refer to [codecabana.com.au]
+
+### ES Module
+
+```bash
+npm install @codecabana/web-components
 ```
 
 ## Publishing
@@ -33,7 +29,7 @@ Version is incremented [semantically](https://semver.org/) using the [convention
 - Atomico (functional web component framework)
 - Babel (transpiler)
 - Rollup (bundler)
-- BrowserSync (dev server)
+- NextJS (demo)
 
 ## ToDo
 
