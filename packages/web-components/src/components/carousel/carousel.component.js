@@ -5,9 +5,9 @@ import { useSwipe, useStateCb, useEventListener } from "../../lib/hooks";
 import { cssJoin } from "../../lib/array";
 import { clamp } from "../../lib/math";
 import Navigators from "./navigators";
-import styles from "./carousel.scss";
+import styles from "./carousel.css";
 
-export default function Carousel(props = {}) {
+function Carousel(props = {}) {
   const {
     width, // Width of the viewport
     height, // Height of the viewport
@@ -269,7 +269,13 @@ export default function Carousel(props = {}) {
   }
 
   return (
-    <host shadowDom tabindex={0} onclick={onClick} onkeydown={onKeyDown}>
+    <host
+      shadowDom
+      tabindex={0}
+      onclick={onClick}
+      onkeydown={onKeyDown}
+      data-hydrate
+    >
       <div
         class={cssJoin(["viewport", swipeable && "swipeable"])}
         part="viewport"

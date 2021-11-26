@@ -13,18 +13,23 @@
     "size": "bundlewatch --config .bundlewatch.config.js",
     "clean": "shx rm -rf dist",
     "prepare:readme": "shx cp ../../README.md ./",
-    "prepare": "run-s clean build prepare:readme test"
+    "prepare": "run-s clean build prepare:readme test",
+    "export": "exports src/components/accordion/accordion.component.jsx --exports"
+  },
+  "dependencies": {
+    "@atomico/hooks": "^3.20.2",
+    "atomico": "^1.34.0"
   },
   "devDependencies": {
-    "@atomico/hooks": "^3.20.2",
+    "@atomico/exports": "^0.21.0",
     "@babel/preset-react": "^7.14.5",
     "@rollup/plugin-babel": "^5.3.0",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.0.6",
-    "atomico": "^1.33.0",
     "bundlewatch": "^0.3.2",
     "fast-glob": "^3.2.7",
     "npm-run-all": "^4.1.5",
+    "react": "^17.0.2",
     "rollup": "^2.58.0",
     "rollup-plugin-scss": "^3.0.0",
     "rollup-plugin-terser": "^7.0.2",
@@ -42,5 +47,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/code-cabana/web-components.git"
+  },
+  "exports": {
+    "./accordion.component": "./dist/accordion.component.js"
   }
 }

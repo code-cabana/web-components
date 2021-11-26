@@ -1,12 +1,15 @@
-import { Carousel } from "@codecabana/web-components";
+// import dynamic from "next/dynamic";
 import MainLayout from "../../../layouts/main";
+// const Carousel = dynamic(() => import("../../../blocks/test"), {
+//   ssr: false,
+// });
+import { Carousel } from "@codecabana/web-components";
 
 export default function ESMComponent() {
-  // console.log(Carousel);
   return (
     <MainLayout title="Code Cabana">
       Hi
-      <codecabana-carousel />
+      <Carousel />
     </MainLayout>
   );
 }

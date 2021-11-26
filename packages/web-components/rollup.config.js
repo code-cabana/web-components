@@ -22,7 +22,7 @@ const commonConfig = {
     scss({ output: false }),
     babel({ babelHelpers: "bundled" }),
     commonjs(),
-    // production && terser(),
+    production && terser(),
   ],
   watch: { clearScreen: false },
 };
@@ -42,7 +42,7 @@ const rootModuleConfig = {
   ...commonConfig,
   input: "src/index.js",
   output: {
-    file: `${targetProject}/dist/index.js`,
+    file: "./dist/index.js",
   },
 };
 

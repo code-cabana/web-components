@@ -115,7 +115,6 @@ export default function useSwipe({
           distance,
           totalDirection,
           totalDirections,
-          totalDirections,
           totalDistance,
         });
         if (shouldReset) resetSwipe(event);

@@ -1,20 +1,16 @@
-import AccordionItem from "./item";
-import { c, useEffect, useHost, useProp, useState } from "atomico";
+import { c, useEffect, useHost, useState } from "atomico";
 import { debug, error } from "../../lib/logger";
+import AccordionItem from "./item";
 import {
   getBookends,
   getRange,
   htmlCollectionToString,
   validateBookends,
 } from "../../lib/dom";
-import styles from "./accordion.scss";
+import styles from "./accordion.css";
 
-export default function Accordion() {
+function Accordion({ id, debug: dbug, icon, expandedIcon }) {
   const host = useHost();
-  const [id] = useProp("id");
-  const [dbug] = useProp("debug");
-  const [icon] = useProp("icon");
-  const [expandedIcon] = useProp("expandedIcon");
   const [items, setItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState({});
 
@@ -75,7 +71,7 @@ export default function Accordion() {
 
   const valid = items.length > 0;
   return valid ? (
-    <host shadowDom>
+    <host shadowDom data-hydrate>
       <div class="items" part="items">
         {items.map((item, index) => {
           const { heading, content } = item;
