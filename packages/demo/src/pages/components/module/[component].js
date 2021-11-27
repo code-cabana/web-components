@@ -3,7 +3,7 @@ import MainLayout from "../../../layouts/main";
 // const Carousel = dynamic(() => import("../../../blocks/test"), {
 //   ssr: false,
 // });
-import { Carousel } from "@codecabana/web-components";
+import Carousel from "@codecabana/web-components";
 
 export default function ESMComponent() {
   return (

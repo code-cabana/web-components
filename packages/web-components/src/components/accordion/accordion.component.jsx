@@ -1,4 +1,4 @@
-import { c, useEffect, useHost, useState } from "atomico";
+import { c, html, useEffect, useHost, useState } from "atomico";
 import { debug, error } from "../../lib/logger";
 import AccordionItem from "./item";
 import {
@@ -70,8 +70,8 @@ function Accordion({ id, debug: dbug, icon, expandedIcon }) {
   }, [document]);
 
   const valid = items.length > 0;
-  return valid ? (
-    <host shadowDom data-hydrate>
+  return html`${valid ? (
+    <host shadowDom>
       <div class="items" part="items">
         {items.map((item, index) => {
           const { heading, content } = item;
@@ -92,7 +92,7 @@ function Accordion({ id, debug: dbug, icon, expandedIcon }) {
     </host>
   ) : (
     <div />
-  );
+  )}`;
 }
 
 Accordion.props = {
