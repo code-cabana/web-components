@@ -1,5 +1,5 @@
 import AccordionItem from "./item";
-import { c, useEffect, useHost, useProp, useState } from "atomico";
+import { c, useEffect, useHost, useState } from "atomico";
 import { debug, error } from "../../lib/logger";
 import {
   getBookends,
@@ -9,12 +9,8 @@ import {
 } from "../../lib/dom";
 import styles from "./accordion.scss";
 
-function Accordion() {
+function Accordion({ id, debug: dbug, icon, expandedIcon }) {
   const host = useHost();
-  const [id] = useProp("id");
-  const [dbug] = useProp("debug");
-  const [icon] = useProp("icon");
-  const [expandedIcon] = useProp("expandedIcon");
   const [items, setItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState({});
 
