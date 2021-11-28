@@ -96,20 +96,24 @@ function Accordion({ id, debug: dbug, icon, expandedIcon }) {
 
 Accordion.props = {
   id: {
+    // description: Identifies the accordion
     type: String,
     reflect: true,
   },
   debug: {
+    // description: Print debug information to the browser console
     type: Boolean,
     reflect: false,
     value: false,
   },
   icon: {
+    // description: Image to use for navigation buttons
     type: String,
     reflect: false,
     value: "https://img.icons8.com/ios-glyphs/452/chevron-right.png",
   },
   expandedIcon: {
+    // description: Image to use for navigation buttons when the accordion item is expanded
     type: String,
     reflect: false,
     value: "https://img.icons8.com/ios-glyphs/452/chevron-down.png",

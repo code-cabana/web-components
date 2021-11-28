@@ -299,71 +299,88 @@ function Carousel(props = {}) {
 
 Carousel.props = {
   width: {
-    type: String, // Width of the carousel viewport
+    // description: Width of the carousel viewport
+    type: String,
     value: "100%",
   },
   height: {
-    type: String, // Height of the carousel viewport
+    // description: Height of the carousel viewport
+    type: String,
     value: "600px",
   },
   itemsPerViewport: {
-    type: Number, // How many items to display per viewport width
+    // description: How many items to display per viewport width
+    type: Number,
     value: 3,
   },
   startItem: {
-    type: Number, // Item to show on page load
+    // description: Item to show on page load
+    type: Number,
     value: 0,
   },
   loop: {
-    type: Boolean, // When reaching the start or end, loop back to the beginning?
+    // description: When reaching the start or end, loop back to the beginning?
+    type: Boolean,
     value: true,
   },
   swipeable: {
-    type: Boolean, // Dragging or swiping the carousel moves it
+    // description: Dragging or swiping the carousel moves it
+    type: Boolean,
     value: true,
   },
   useMomentum: {
-    type: Boolean, // When finishing a swipe, preserve momentum
+    // description: When finishing a swipe, preserve momentum
+    type: Boolean,
     value: true,
   },
   momentumMultiplier: {
-    type: Number, // Drift further after ending a swipe
+    // description: Drift further after ending a swipe
+    type: Number,
     value: 1.5,
   },
   snap: {
-    type: Boolean, // When completing a swipe, snap to the nearest item
+    // description: When completing a swipe, snap to the nearest item
+    type: Boolean,
     value: true,
   },
   reverse: {
-    type: Boolean, // Reverse the display order of items
+    // description: Reverse the display order of items
+    type: Boolean,
     value: false,
   },
   dragThreshold: {
-    type: Number, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    // description: Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
+    type: Number,
     value: 200,
   },
   minSwipeDistance: {
-    type: Number, // Minimum swipe distance required in pixels to use momentum
+    // description: Minimum swipe distance required in pixels to use momentum
+    type: Number,
     value: 50,
   },
   icon: {
-    type: String, // Image used for navigator buttons
+    // description: Image used for navigator buttons
+    type: String,
     value: "https://unpkg.com/@codecabana/assets@latest/img/arrow.png",
   },
   flipNav: {
-    type: Boolean, // Reverse the direction of the navigator buttons
+    // description: Reverse the direction of the navigator buttons
+    type: Boolean,
     value: false,
   },
   duration: {
-    type: Number, // Transition duration in millis
+    // description: Transition duration in millis
+    type: Number,
     value: 300,
   },
   easing: {
-    type: String, // Transition easing - https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
+    // description: // Transition easing - https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
+    type: String,
     value: "ease-out",
   },
   onChange: {
-    type: Function, // Called when the current item changes
+    // description: // Called when the current item changes
+    type: Function,
     value: () => {},
   },
 };
