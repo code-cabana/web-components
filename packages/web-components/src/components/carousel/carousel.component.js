@@ -374,12 +374,13 @@ Carousel.props = {
     value: 300,
   },
   easing: {
-    // description: // Transition easing - https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
+    // description: Transition easing - See here for more info: https://developer.mozilla.org/en-US/docs/Web/CSS/transition-timing-function
     type: String,
     value: "ease-out",
   },
   onChange: {
-    // description: // Called when the current item changes
+    // hide: true
+    // description: Called when the current item changes
     type: Function,
     value: () => {},
   },

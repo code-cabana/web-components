@@ -100,12 +100,6 @@ Accordion.props = {
     type: String,
     reflect: true,
   },
-  debug: {
-    // description: Print debug information to the browser console
-    type: Boolean,
-    reflect: false,
-    value: false,
-  },
   icon: {
     // description: Image to use for navigation buttons
     type: String,
@@ -117,6 +111,13 @@ Accordion.props = {
     type: String,
     reflect: false,
     value: "https://img.icons8.com/ios-glyphs/452/chevron-down.png",
+  },
+  debug: {
+    // hide: true
+    // description: Print debug information to the browser console
+    type: Boolean,
+    reflect: false,
+    value: false,
   },
 };
 
