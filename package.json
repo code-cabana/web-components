@@ -3,10 +3,13 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "dev": "lerna run dev --stream --parallel",
+    "dev": "npm run dev:lerna",
+    "dev:remote": "run-p dev:lerna dev:ngrok",
     "build": "lerna run build --stream",
     "test": "lerna run test --stream",
     "clean": "lerna run clean --stream",
+    "dev:lerna": "lerna run dev --stream --parallel",
+    "dev:ngrok": "ngrok http 3000",
     "version:ci": "lerna version -y --conventional-commits --create-release github",
     "publish:ci": "lerna publish -y from-package --no-verify-access",
     "release:local": "env-cmd run-s bootstrap version:ci publish:ci"
@@ -14,6 +17,7 @@
   "devDependencies": {
     "env-cmd": "^10.1.0",
     "lerna": "^4.0.0",
+    "ngrok": "^4.2.2",
     "npm-run-all": "^4.1.5"
   }
 }
