@@ -22,7 +22,11 @@ export default function useSwipe({
 
   // Returns X/Y coordinates of an event
   function getPosition(event) {
-    const { pageX: x, pageY: y } = event || {};
+    if (!event) return {};
+    const x =
+      event.pageX || event.touches[0]?.pageX || event.changedTouches[0]?.pageX;
+    const y =
+      event.pageY || event.touches[0]?.pageY || event.changedTouches[0]?.pageY;
     return { x, y };
   }
 
@@ -91,7 +95,6 @@ export default function useSwipe({
     (event) => {
       event.preventDefault();
       if (!held) return;
-
       if (typeof onSwiping === "function") {
         const currentPos = getPosition(event);
         const { direction, directions, distance } = getDirAndDist(
