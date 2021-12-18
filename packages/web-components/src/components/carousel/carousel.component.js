@@ -254,7 +254,6 @@ function Carousel(props = {}) {
     const goingRight = Math.sign(count) === 1;
     const needsToWrap = (atStart && goingLeft) || (atEnd && goingRight);
 
-    console.log(needsToWrap);
     if (needsToWrap) {
       wrapCurrentPosition();
     } else {
