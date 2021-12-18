@@ -54,8 +54,10 @@ slot {
     background-color: transparent;
     border: none;
 
-    $maxWidth: 96px;
     width: 15vw;
+    $minWidth: 64px;
+    $maxWidth: 96px;
+    min-width: $minWidth;
     max-width: $maxWidth;
     padding: 16px;
     transition: width 0.1s, max-width 0.1s;
@@ -70,7 +72,7 @@ slot {
       cursor: auto;
     }
 
-    &:hover:not(.disabled) {
+    &.enlarge:hover:not(.disabled) {
       $enlargedWidth: calc(#{$maxWidth} * 1.15);
       width: $enlargedWidth;
       max-width: $enlargedWidth;

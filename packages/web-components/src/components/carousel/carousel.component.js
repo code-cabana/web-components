@@ -27,6 +27,7 @@ function Carousel(props = {}) {
     minSwipeDistance,
     icon,
     flipNav,
+    enlargeNav,
     duration,
     easing,
     onChange,
@@ -323,7 +324,14 @@ function Carousel(props = {}) {
           <slot ref={slotRef} name="item" />
           {items}
         </div>
-        {Navigators({ adjustActiveItem, icon, flipNav, atStart, atEnd })}
+        {Navigators({
+          adjustActiveItem,
+          icon,
+          flipNav,
+          enlargeNav,
+          atStart,
+          atEnd,
+        })}
       </div>
       <style>{styles}</style>
     </host>
@@ -420,6 +428,11 @@ Carousel.props = {
     // description: Reverse the direction of the navigator buttons
     type: Boolean,
     value: false,
+  },
+  enlargeNav: {
+    // description: Enlarge navigator buttons when they are clicked/hovered
+    type: Boolean,
+    value: true,
   },
   duration: {
     // description: Transition duration in millis
