@@ -101,6 +101,7 @@ function Carousel(props = {}) {
     const clone = itemNode.cloneNode(true);
     clone.setAttribute("class", "item");
     clone.setAttribute("part", "item");
+    clone.removeAttribute("slot");
     return renderHtml(clone.outerHTML);
   }
 

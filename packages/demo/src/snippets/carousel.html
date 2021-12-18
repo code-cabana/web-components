@@ -1,6 +1,11 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitter:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
+
 <p>Some stuff before the carousel</p>
 <hr />
-<codecabana-carousel>
+<!-- Images -->
+<!-- <codecabana-carousel>
   <img slot="item" src="https://source.unsplash.com/5eThdzpVqyE/100x100" alt="start" />
   <img slot="item" src="https://via.placeholder.com/100x100?1" alt="1" />
   <img slot="item" src="https://via.placeholder.com/100x100" alt="2" />
@@ -9,6 +14,34 @@
   <img slot="item" src="https://via.placeholder.com/100x100" alt="5" />
   <img slot="item" src="https://via.placeholder.com/100x100" alt="6" />
   <img slot="item" src="https://source.unsplash.com/j2s9TffBQLk/100x100" alt="end" />
+</codecabana-carousel> -->
+
+<!-- Testimonials -->
+<codecabana-carousel items-per-viewport="1" autoplay="false" enlarge-nav="false">
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">I am completely blown away</p>
+      <span part="author">Buzz Lightyear</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">Completely surpassed my expectations</p>
+      <span part="author">Bruce Wayne</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">It's exactly what I've been looking for</p>
+      <span part="author">Legolas</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">Dude, your stuff is the bomb!</p>
+      <span part="author">Mr. T</span>
+    </div>
+  </div>
 </codecabana-carousel>
 
 <hr />
@@ -32,4 +65,46 @@
   codecabana-carousel::part(item) {
     height: 200px;
   } */
+
+  codecabana-carousel::part(viewport)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("https://i.imgur.com/Iazhj4n.jpg");
+    filter: opacity(20%) blur(3px);
+  }
+
+  codecabana-carousel::part(item) {
+    display: inline-grid;
+    position: relative;
+    padding: 16px;
+    border: none;
+
+    font-size: 42px;
+    font-family: "Bitter";
+    text-align: center;
+  }
+
+  codecabana-carousel::part(testimonial) {
+    width: 80%;
+    max-width: 1050px;
+    margin: auto;
+  }
+
+  codecabana-carousel::part(quote) {
+    margin: 0;
+  }
+
+  codecabana-carousel::part(author) {
+    font-size: 22px;
+    font-family: sans-serif;
+    text-transform: uppercase;
+  }
+
+  codecabana-carousel::part(navigator) {
+    filter: brightness(0%);
+  }
 </style>
