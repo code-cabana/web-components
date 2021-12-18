@@ -9,23 +9,27 @@ import styles from "./carousel.scss";
 
 function Carousel(props = {}) {
   const {
-    width, // Width of the viewport
-    height, // Height of the viewport
-    itemsPerViewport: _itemsPerViewport, // How many items to display per viewport width
-    startItem: _startItem, // Item to show on page load
-    loop, // When reaching the start or end, loop back to the beginning?
-    swipeable, // Dragging or swiping the carousel moves it
-    useMomentum, // When finishing a swipe, preserve momentum
-    momentumMultiplier, // Drift further after ending a swipe
-    snap, // When completing a swipe, snap to the nearest item
-    reverse, // Reverse the display order of items
-    dragThreshold, // Time in millis that a swipe (preserves momentum) becomes a drag (no momentum)
-    minSwipeDistance, // Minimum swipe distance required in pixels to use momentum
-    icon, // Image used for navigator buttons
-    flipNav, // Reverse the direction of the navigator buttons
-    duration, // Transition duration in millis
-    easing, // Transition easing
-    onChange, // Called when the current item changes
+    width,
+    height,
+    itemsPerViewport: _itemsPerViewport,
+    startItem: _startItem,
+    loop,
+    autoplay,
+    autoplayInterval,
+    autoplayDirection,
+    autoplayPauseOnFocus,
+    swipeable,
+    useMomentum,
+    momentumMultiplier,
+    snap,
+    reverse,
+    dragThreshold,
+    minSwipeDistance,
+    icon,
+    flipNav,
+    duration,
+    easing,
+    onChange,
   } = props;
   const allProps = Object.values(props);
 
@@ -44,6 +48,8 @@ function Carousel(props = {}) {
   const [activeItem, setActiveItem] = useState(0);
   const [basePosition, setBasePosition] = useStateCb(0); // Position excluding swipe data
   const [swipeDelta, setSwipeDelta] = useState(0); // Pixel length of the current swipe
+  const [focused, setFocused] = useState(false);
+  const [autoplayTicks, setAutoplayTicks] = useState(0);
 
   const loopStart = itemsPerViewport;
   const trackWidth = items.length * itemWidth;
@@ -57,6 +63,8 @@ function Carousel(props = {}) {
   useEffect(buildItems, [itemNodes, itemsPerViewport]);
   useEffect(goToStartItem, [items, itemWidth]);
   useEffect(onChange, [activeItem]);
+  useEffect(initAutoplayCycle, [autoplay, items]);
+  useEffect(onAutoplayCycle, [autoplayTicks]);
   useEventListener("resize", onResize, window);
 
   // Initialization
@@ -223,16 +231,18 @@ function Carousel(props = {}) {
 
     setActiveItem(immediateItem); // Immediately set activeItem to the same item on the other side of loop
     setBasePosition(offsetPosition, () => {
-      // Immediately set to the offset position and then wait for next animation frame
+      // Immediately set to the offset position and then wait for next 2 animation frames
       requestAnimationFrame(() => {
-        trackRef.current.style.transition = ""; // Re-enable transition
+        requestAnimationFrame(() => {
+          trackRef.current.style.transition = ""; // Re-enable transition
 
-        const moveToPosition = atEnd
-          ? snapPosition + itemWidth
-          : snapPosition - itemWidth; // Determine the next position to move towards
-        const moveToItem = atEnd ? immediateItem + 1 : immediateItem - 1;
-        setBasePosition(moveToPosition); // Go to the next item's position
-        setActiveItem(moveToItem);
+          const moveToPosition = atEnd
+            ? snapPosition + itemWidth
+            : snapPosition - itemWidth; // Determine the next position to move towards
+          const moveToItem = atEnd ? immediateItem + 1 : immediateItem - 1;
+          setBasePosition(moveToPosition); // Go to the next item's position
+          setActiveItem(moveToItem);
+        });
       });
     });
   }
@@ -243,6 +253,7 @@ function Carousel(props = {}) {
     const goingRight = Math.sign(count) === 1;
     const needsToWrap = (atStart && goingLeft) || (atEnd && goingRight);
 
+    console.log(needsToWrap);
     if (needsToWrap) {
       wrapCurrentPosition();
     } else {
@@ -257,6 +268,21 @@ function Carousel(props = {}) {
     }
   }
 
+  function onAutoplayCycle() {
+    if (!autoplay) return;
+    if (autoplayPauseOnFocus && focused) return;
+    if (autoplayDirection === "left") adjustActiveItem(-1);
+    else adjustActiveItem(1);
+  }
+
+  function initAutoplayCycle() {
+    if (!autoplay) return;
+    const autoplayIntervalRef = setInterval(() => {
+      setAutoplayTicks((prevTicks) => prevTicks + 1);
+    }, autoplayInterval);
+    return () => clearInterval(autoplayIntervalRef);
+  }
+
   function onClick() {
     if (!host?.current) return;
     host.current.focus();
@@ -269,7 +295,14 @@ function Carousel(props = {}) {
   }
 
   return (
-    <host shadowDom tabindex={0} onclick={onClick} onkeydown={onKeyDown}>
+    <host
+      shadowDom
+      tabindex={0}
+      onclick={onClick}
+      onkeydown={onKeyDown}
+      onfocus={() => setFocused(true)}
+      onblur={() => setFocused(false)}
+    >
       <div
         class={cssJoin(["viewport", swipeable && "swipeable"])}
         part="viewport"
@@ -320,6 +353,26 @@ Carousel.props = {
   },
   loop: {
     // description: When reaching the start or end, loop back to the beginning?
+    type: Boolean,
+    value: true,
+  },
+  autoplay: {
+    // description: Automatically cycle through items
+    type: Boolean,
+    value: true,
+  },
+  autoplayInterval: {
+    // description: Time in milliseconds to wait before cycling to the next item
+    type: Number,
+    value: 3000,
+  },
+  autoplayDirection: {
+    // description: Direction to cycle through items
+    type: String,
+    value: "right",
+  },
+  autoplayPauseOnFocus: {
+    // description: Pause autoplay when the carousel is focused
     type: Boolean,
     value: true,
   },

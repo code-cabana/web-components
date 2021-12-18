@@ -5,11 +5,11 @@
     "bootstrap": "lerna bootstrap",
     "dev": "npm run dev:lerna",
     "dev:remote": "run-p dev:lerna dev:ngrok",
+    "dev:lerna": "lerna run dev --stream --parallel",
+    "dev:ngrok": "ngrok http 3000",
     "build": "lerna run build --stream",
     "test": "lerna run test --stream",
     "clean": "lerna run clean --stream",
-    "dev:lerna": "lerna run dev --stream --parallel",
-    "dev:ngrok": "ngrok http 3000",
     "version:ci": "lerna version -y --conventional-commits --create-release github",
     "publish:ci": "lerna publish -y from-package --no-verify-access",
     "release:local": "env-cmd run-s bootstrap version:ci publish:ci"
