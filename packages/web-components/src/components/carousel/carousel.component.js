@@ -45,13 +45,14 @@ function Carousel(props = {}) {
   const [viewportWidth, setViewportWidth] = useState();
   const [itemWidth, setItemWidth] = useState();
   const [items, setItems] = useState([]);
-  const [itemsPerViewport, setItemsPerViewport] = useState(1);
+  const [itemsPerViewportUnclamped, setItemsPerViewport] = useState(_itemsPerViewport);
   const [activeItem, setActiveItem] = useState(0);
   const [basePosition, setBasePosition] = useStateCb(0); // Position excluding swipe data
   const [swipeDelta, setSwipeDelta] = useState(0); // Pixel length of the current swipe
   const [focused, setFocused] = useState(false);
   const [autoplayTicks, setAutoplayTicks] = useState(0);
 
+  const itemsPerViewport = Math.max(1, itemsPerViewportUnclamped);
   const loopStart = itemsPerViewport;
   const trackWidth = items.length * itemWidth;
   const endEdgePos = trackWidth - viewportWidth;
