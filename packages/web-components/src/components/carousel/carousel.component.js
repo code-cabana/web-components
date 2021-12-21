@@ -45,7 +45,8 @@ function Carousel(props = {}) {
   const [viewportWidth, setViewportWidth] = useState();
   const [itemWidth, setItemWidth] = useState();
   const [items, setItems] = useState([]);
-  const [itemsPerViewportUnclamped, setItemsPerViewport] = useState(_itemsPerViewport);
+  const [itemsPerViewportUnclamped, setItemsPerViewport] =
+    useState(_itemsPerViewport);
   const [activeItem, setActiveItem] = useState(0);
   const [basePosition, setBasePosition] = useStateCb(0); // Position excluding swipe data
   const [swipeDelta, setSwipeDelta] = useState(0); // Pixel length of the current swipe
@@ -214,9 +215,11 @@ function Carousel(props = {}) {
     const { atEdge, atEnd } = isAtEdge();
     if (!atEdge) return;
 
-    const { x: computedPosition } = getMatrixTranslateValues(
+    const matrixTranslateValues = getMatrixTranslateValues(
       getComputedStyle(trackRef?.current).getPropertyValue("transform")
     );
+    if (!matrixTranslateValues) return;
+    const { x: computedPosition } = matrixTranslateValues;
     const distanceToEdge = atEnd
       ? trackWidth - (Math.abs(computedPosition) + viewportWidth)
       : Math.abs(computedPosition); // Determine distance to edge of the loop

@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "atomico/core";
-import { useEventListener } from "./index";
+import useEventListener from "./useEventListener";
 
 // Detects touch and mouse swipe movement and executes a callback function
 // onSwipeStart ({ swipeStartPos, swipeStartTime })

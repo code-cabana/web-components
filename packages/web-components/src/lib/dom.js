@@ -59,6 +59,8 @@ export function renderHtml(htmlString) {
 // Extracts translation values from a CSS matrix string
 export function getMatrixTranslateValues(matrixString) {
   const matrixType = matrixString.includes("3d") ? "3d" : "2d";
+  const match = matrixString.match(/matrix.*\((.+)\)/);
+  if (!match) return null;
   const matrixValues = matrixString.match(/matrix.*\((.+)\)/)[1].split(", ");
   return matrixType === "2d"
     ? { x: matrixValues[4], y: matrixValues[5], matrixType }
