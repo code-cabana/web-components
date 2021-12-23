@@ -457,3 +457,15 @@ Carousel.props = {
 };
 
 customElements.define("codecabana-carousel", c(Carousel));
+
+/* Parts
+
+viewport
+track
+item
+navigators
+navigator
+previous
+next
+
+*/

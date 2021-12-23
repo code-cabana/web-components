@@ -122,3 +122,15 @@ Accordion.props = {
 };
 
 customElements.define("codecabana-accordion", c(Accordion));
+
+/* Parts
+
+items
+item
+expanded
+heading
+icon
+expandedIcon
+content
+
+*/
