@@ -6,13 +6,18 @@ import {
   getRange,
   htmlCollectionToString,
   validateBookends,
+  getClosestChild,
 } from "../../lib/dom";
 import styles from "./accordion.scss";
 
 function Accordion({ id, debug: dbug, icon, expandedIcon }) {
   const host = useHost();
+  const [active, setActive] = useState(false);
   const [items, setItems] = useState([]);
   const [expandedItems, setExpandedItems] = useState({});
+  const [hiddenContainer, setHiddenContainer] = useState();
+  const [bookends, setBookends] = useState();
+  const [commonAncestor, setCommonAncestor] = useState();
 
   function extractItem(headingEl, index, headings, docFrag) {
     const isLastHeading = !headings[index + 1];
@@ -35,8 +40,9 @@ function Accordion({ id, debug: dbug, icon, expandedIcon }) {
     return valid && { id: index, heading, content };
   }
 
-  function extractItems(range) {
+  function extractItems(range, bookends) {
     const docFrag = range.extractContents();
+
     const headings = Array.from(
       docFrag.querySelectorAll("h1, h2, h3, h4, h5, h6")
     );
@@ -50,47 +56,117 @@ function Accordion({ id, debug: dbug, icon, expandedIcon }) {
 
     dbug && debug("Items", newItems);
     setItems(newItems);
+
+    const hiddenContent = document.createElement("div");
+    range.commonAncestorContainer.insertBefore(
+      hiddenContent,
+      getClosestChild(range.commonAncestorContainer, bookends[0])
+    );
+    hiddenContent.appendChild(docFrag);
+    hiddenContent.style = "display: none;";
+    hiddenContent.id = `codecabana-accordion-hidden-content-${id}`;
+    setHiddenContainer(hiddenContent);
+    setCommonAncestor(range.commonAncestorContainer);
   }
 
   function init() {
     const bookends = getBookends("accordion", id);
     dbug && debug("Bookends:", bookends);
     if (!validateBookends(bookends, id)) return;
+    setBookends(bookends);
     const isStart = bookends[0] === host.current;
     if (!isStart) return;
     const range = getRange(bookends[0], bookends[1]);
-    extractItems(range);
+    extractItems(range, bookends);
+    setActive(true);
+  }
+
+  function destroy() {
+    const isStart = bookends[0] === host.current;
+    if (!isStart) return;
+    setActive(false);
+
+    const range = new Range();
+    range.selectNodeContents(hiddenContainer);
+    const hiddenContent = range.extractContents();
+    commonAncestor.insertBefore(
+      hiddenContent,
+      getClosestChild(commonAncestor, bookends[1])
+    );
+
+    hiddenContainer.remove();
+
+    requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        setItems([]);
+      })
+    );
   }
 
   useEffect(() => {
     init();
-    document.addEventListener("DOMContentLoaded", () => init);
-    document.addEventListener("pageChange", () => init);
+    return () => destroy();
+  }, []);
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutationsList) => {
+      for (const mutation of mutationsList) {
+        console.log("MUTATION", mutation);
+        // if (mutation.type === "childList") {
+        //   console.log("A child node has been added or removed.");
+        // } else if (mutation.type === "subtree") {
+        //   console.log(
+        //     "The " + mutation.attributeName + " attribute was modified."
+        //   );
+        // }
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+    return () => observer.disconnect();
   }, []);
 
   const valid = items.length > 0;
-  return valid ? (
+  return (
     <host shadowDom>
-      <div class="items" part="items">
-        {items.map((item, index) => {
-          const { heading, content } = item;
-          const expanded = expandedItems[index];
-          return AccordionItem({
-            heading,
-            content,
-            icon,
-            expandedIcon,
-            expanded,
-            setExpanded: () => {
-              setExpandedItems({ ...expandedItems, [index]: !expanded });
-            },
-          });
-        })}
-      </div>
-      <style>{styles}</style>
+      <button
+        onclick={() => {
+          console.log("init");
+          init();
+        }}
+      >
+        INIT
+      </button>
+      <button
+        onclick={() => {
+          console.log("destroy");
+          destroy();
+        }}
+      >
+        DESTROY
+      </button>
+      {valid ? (
+        <div>
+          <div class="items" part="items">
+            {items.map((item, index) => {
+              const { heading, content } = item;
+              const expanded = expandedItems[index];
+              return AccordionItem({
+                active,
+                heading,
+                content,
+                icon,
+                expandedIcon,
+                expanded,
+                setExpanded: () => {
+                  setExpandedItems({ ...expandedItems, [index]: !expanded });
+                },
+              });
+            })}
+          </div>
+          <style>{styles}</style>
+        </div>
+      ) : null}
     </host>
-  ) : (
-    <div />
   );
 }
 

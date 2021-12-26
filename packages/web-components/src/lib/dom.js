@@ -36,6 +36,15 @@ export function validateBookends(bookends, id) {
   return true;
 }
 
+// Returns the child closest to the parent
+export function getClosestChild(parent, nestedChild) {
+  let child = nestedChild;
+  while (child.parentElement !== parent) {
+    child = child.parentElement;
+  }
+  return child;
+}
+
 // Returns a range between two elements
 // https://developer.mozilla.org/en-US/docs/Web/API/Range
 export function getRange(startEl, endEl, includeFirst, includeLast) {

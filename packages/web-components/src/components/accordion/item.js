@@ -4,6 +4,7 @@ import { collapse } from "../../lib/animation";
 import { useEffect, useRef, useState } from "atomico/core";
 
 export default function AccordionItem({
+  active,
   heading,
   content,
   icon,
@@ -19,7 +20,7 @@ export default function AccordionItem({
     const { update, destroy } = collapse(contentRef.current, { open: false });
     setCollapseRef({ update, destroy });
     return destroy;
-  }, [contentRef]);
+  }, [contentRef, active]);
 
   useEffect(() => {
     const { update } = collapseRef;
