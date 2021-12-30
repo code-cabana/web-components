@@ -40,6 +40,7 @@ function Slideshow({
     <host shadowDom>
       <div
         class="viewport"
+        part="viewport"
         style={{
           "--width": width,
           "--height": height,
