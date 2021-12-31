@@ -1,7 +1,8 @@
 import { c, useEffect, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
-import styles from "./tabs.scss";
+import { cssJoin } from "../../lib/array";
 import { renderHtml } from "../../lib/dom";
+import styles from "./tabs.scss";
 
 function Tabs({ id }) {
   const slotRef = useRef();
