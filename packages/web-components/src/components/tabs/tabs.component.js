@@ -33,7 +33,7 @@ function Tabs({
           role="tab"
           id={title}
           class={cssJoin(["title", visible && "active"])}
-          part={cssJoin(["title", visible && "active"])}
+          part={cssJoin(["title", visible && "title-active"])}
           data-index={index}
           aria-selected="false"
           aria-controls={`${title}-tab`}
@@ -51,7 +51,7 @@ function Tabs({
         <div
           id={`${title}-tab`}
           class={cssJoin(["content", visible && "active"])}
-          part={cssJoin(["content", visible && "active"])}
+          part={cssJoin(["content", visible && "content-active"])}
           data-index={index}
           tabindex={visible ? 0 : undefined}
           role="tabpanel"
