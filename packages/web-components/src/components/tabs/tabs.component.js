@@ -20,12 +20,13 @@ function Tabs({ id }) {
   function rebuild() {
     const titles = items.map((el, index) => {
       const title = el.getAttribute("title") || "Missing title";
+      const visible = index === activeTab;
       return (
         <button
           role="tab"
           id={title}
-          class="title"
-          part="title"
+          class={cssJoin(["title", visible && "active"])}
+          part={cssJoin(["title", visible && "active"])}
           data-index={index}
           aria-selected="false"
           aria-controls={`${title}-tab`}
@@ -42,8 +43,8 @@ function Tabs({ id }) {
       return (
         <div
           id={`${title}-tab`}
-          class="content"
-          part="content"
+          class={cssJoin(["content", visible && "active"])}
+          part={cssJoin(["content", visible && "active"])}
           data-index={index}
           tabindex={visible ? 0 : undefined}
           role="tabpanel"
