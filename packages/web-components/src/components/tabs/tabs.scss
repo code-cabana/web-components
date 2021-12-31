@@ -21,11 +21,12 @@
 }
 
 .title {
-  font-size: 42px;
+  font-size: 36px;
   text-align: left;
   cursor: pointer;
   border: none;
   background-color: transparent;
+  padding: 0;
 
   &:hover {
     text-decoration: underline dashed;
