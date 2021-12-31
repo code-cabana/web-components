@@ -2,9 +2,9 @@
   "name": "demo",
   "private": true,
   "scripts": {
-    "dev": "next-remote-watch ./public/dist",
+    "dev": "cross-env PORT=4000 next-remote-watch ./public/dist",
     "export": "next build && next export -o dist",
-    "start": "serve dist -p 3000",
+    "start": "serve dist -p 4000",
     "lint": "next lint"
   },
   "dependencies": {
@@ -17,6 +17,7 @@
     "xhtm": "^1.5.3"
   },
   "devDependencies": {
+    "cross-env": "^7.0.3",
     "eslint": "7.32.0",
     "eslint-config-next": "12.0.1",
     "html-loader": "^3.0.0",
