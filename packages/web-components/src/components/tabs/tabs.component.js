@@ -25,6 +25,7 @@ function Tabs({ id }) {
           role="tab"
           id={title}
           class="title"
+          part="title"
           data-index={index}
           aria-selected="false"
           aria-controls={`${title}-tab`}
@@ -42,6 +43,7 @@ function Tabs({ id }) {
         <div
           id={`${title}-tab`}
           class="content"
+          part="content"
           data-index={index}
           tabindex={visible ? 0 : undefined}
           role="tabpanel"
@@ -63,10 +65,12 @@ function Tabs({ id }) {
   return (
     <host shadowDom>
       <slot ref={slotRef} />
-      <div class="titles" role="tablist" aria-label={id}>
+      <div class="titles" part="titles" role="tablist" aria-label={id}>
         {titles}
       </div>
-      <div class="contents">{contents}</div>
+      <div class="contents" part="contents">
+        {contents}
+      </div>
       <style>{styles}</style>
     </host>
   );
