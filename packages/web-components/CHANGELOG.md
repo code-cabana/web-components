@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.35](https://github.com/code-cabana/web-components/compare/v0.0.34...v0.0.35) (2021-12-31)
+
+**Note:** Version bump only for package @codecabana/web-components
+
+
+
+
+
 ## [0.0.34](https://github.com/code-cabana/web-components/compare/v0.0.33...v0.0.34) (2021-12-31)
 
 **Note:** Version bump only for package @codecabana/web-components
