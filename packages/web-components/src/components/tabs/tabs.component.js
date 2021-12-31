@@ -4,7 +4,13 @@ import { cssJoin } from "../../lib/array";
 import { renderHtml } from "../../lib/dom";
 import styles from "./tabs.scss";
 
-function Tabs({ id }) {
+function Tabs({
+  id,
+  minHeight,
+  backgroundColor,
+  titleMaxWidth,
+  contentMaxWidth,
+}) {
   const slotRef = useRef();
   const rawItems = useSlot(slotRef);
   const items = rawItems.filter((el) => el instanceof HTMLElement);
@@ -65,7 +71,15 @@ function Tabs({ id }) {
   useEffect(rebuild, [rawItems, activeTab]);
 
   return (
-    <host shadowDom>
+    <host
+      shadowDom
+      style={{
+        "--min-height": minHeight,
+        "--background-color": backgroundColor,
+        "--title-max-width": titleMaxWidth,
+        "--content-max-width": contentMaxWidth,
+      }}
+    >
       <slot ref={slotRef} />
       <div class="titles" part="titles" role="tablist" aria-label={id}>
         {titles}
