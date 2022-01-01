@@ -1,7 +1,9 @@
 :host {
+  position: relative;
+  height: var(--height, auto);
+  min-height: var(--min-height, 300px);
   display: grid;
   grid-template-columns: minmax(auto, var(--title-max-width, auto)) auto;
-  min-height: var(--min-height, 300px);
   align-content: center;
   align-items: center;
   justify-items: center;
@@ -21,11 +23,11 @@
 }
 
 .title {
-  font-size: 36px;
   text-align: left;
   cursor: pointer;
   border: none;
   background-color: transparent;
+  white-space: nowrap;
   padding: 0;
 
   &:hover {
@@ -35,31 +37,10 @@
 
 .contents {
   max-width: var(--content-max-width, 600px);
+  overflow-y: auto;
+  height: 100%;
 }
 
 .content[hidden] {
   display: none;
-}
-
-@media only screen and (max-width: 1200px) {
-  .title {
-    font-size: 32px;
-  }
-}
-
-@media only screen and (max-width: 900px) {
-  .title {
-    font-size: 24px;
-  }
-}
-
-@media only screen and (max-width: 600px) {
-  :host {
-    grid-template-columns: 1fr;
-    align-items: start;
-    align-content: start;
-    justify-items: start;
-    justify-content: start;
-    row-gap: 16px;
-  }
 }

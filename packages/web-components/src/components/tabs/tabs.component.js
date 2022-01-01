@@ -6,6 +6,7 @@ import styles from "./tabs.scss";
 
 function Tabs({
   id,
+  height,
   minHeight,
   backgroundColor,
   titleMaxWidth,
@@ -74,6 +75,7 @@ function Tabs({
     <host
       shadowDom
       style={{
+        "--height": height,
         "--min-height": minHeight,
         "--background-color": backgroundColor,
         "--title-max-width": titleMaxWidth,
@@ -98,8 +100,13 @@ Tabs.props = {
     type: String,
     value: "tabs",
   },
+  height: {
+    // description: Height of the tabs component. Use this instead of "min-height" if you don't want tabs to expand based on their content. Any valid CSS unit is accepted
+    type: String,
+    value: "auto",
+  },
   minHeight: {
-    // description: Minimum height of the entire tabs component. It's important to set this to a value that is greater than the height of the tallest tab's content so that the titles don't move around when switching between tabs. Any valid CSS unit is accepted
+    // description: Minimum height of the tabs component. Use this instead of "height" if you do want tabs to expand based on their content. Any valid CSS unit is accepted
     type: String,
     value: "300px",
   },
