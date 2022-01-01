@@ -59,7 +59,6 @@ function Tabs({
           role="tabpanel"
           aria-labelledby={title}
           aria-selected={visible ? "true" : undefined}
-          // hidden={visible ? undefined : "true"}
         >
           {renderHtml(el.innerHTML)}
         </div>
