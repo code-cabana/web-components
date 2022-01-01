@@ -9,6 +9,7 @@ function Tabs({
   height,
   minHeight,
   backgroundColor,
+  fadeDuration,
   titleMaxWidth,
   contentMaxWidth,
 }) {
@@ -58,7 +59,7 @@ function Tabs({
           role="tabpanel"
           aria-labelledby={title}
           aria-selected={visible ? "true" : undefined}
-          hidden={visible ? undefined : "true"}
+          // hidden={visible ? undefined : "true"}
         >
           {renderHtml(el.innerHTML)}
         </div>
@@ -78,6 +79,7 @@ function Tabs({
         "--height": height,
         "--min-height": minHeight,
         "--background-color": backgroundColor,
+        "--fade-duration": `${fadeDuration}ms`,
         "--title-max-width": titleMaxWidth,
         "--content-max-width": contentMaxWidth,
       }}
@@ -114,6 +116,11 @@ Tabs.props = {
     // description: Self explanatory
     type: String,
     value: "transparent",
+  },
+  fadeDuration: {
+    // description: Duration of the fade transition in milliseconds
+    type: Number,
+    value: 300,
   },
   titleMaxWidth: {
     // description: The maximum width of any title. Any valid CSS unit is accepted
