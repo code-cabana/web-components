@@ -31,14 +31,6 @@
   background-color: transparent;
   white-space: nowrap;
   padding: 0;
-
-  &:hover {
-    text-decoration: underline dashed;
-  }
-
-  &.active {
-    text-decoration: underline solid;
-  }
 }
 
 .contents {
@@ -60,13 +52,8 @@
 
 .content.active {
   visibility: visible;
-  opacity: 1;
-  transition: visibility 0s linear 0s, opacity var(--fade-duration, 300ms);
 }
 
 .content:not(.active) {
   visibility: hidden;
-  opacity: 0;
-  transition: visibility 0s linear var(--fade-duration, 300ms),
-    opacity var(--fade-duration, 300ms);
 }
