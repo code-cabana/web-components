@@ -62,7 +62,17 @@ export function htmlCollectionToString(collection) {
 }
 // Render an HTML string using xhtm
 export function renderHtml(htmlString) {
-  return html([htmlString]);
+  const escaped = escapeQuotes(htmlString); // Atomico incorrectly renders HTML tags if rogue apostrophes or quotes are present
+  return html([escaped]);
+}
+
+// Replaces all instances of ' -> ’ and "word" -> “word”
+function escapeQuotes(string) {
+  return string
+    .replace(/'/gm, "’")
+    .replace(/(\s)"/gm, "$1“")
+    .replace(/"(\s)/gm, "”$1")
+    .replace(/"/gm, "“");
 }
 
 // Extracts translation values from a CSS matrix string
