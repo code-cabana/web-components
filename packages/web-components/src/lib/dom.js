@@ -62,8 +62,25 @@ export function htmlCollectionToString(collection) {
 }
 // Render an HTML string using xhtm
 export function renderHtml(htmlString) {
-  const escaped = escapeQuotes(htmlString); // Atomico incorrectly renders HTML tags if rogue apostrophes or quotes are present
-  return html([escaped]);
+  return html([htmlString]);
+}
+
+// Sanitizes an HTML element's inner text
+// Necessary because Atomico incorrectly renders HTML tags if rogue apostrophes or quotes are present
+export function sanitizeTextContent(element) {
+  recurseTextContent(element, escapeQuotes);
+}
+
+// Call a function that receives all children node textContents as input
+function recurseTextContent(node, callback) {
+  if (!node | (typeof callback !== "function")) return;
+  if (node.nodeType === 3) {
+    node.textContent = callback(node.textContent); // If the current node is a text node, do the replacement
+  } else {
+    Array.from(node.childNodes).forEach(function (child) {
+      recurseTextContent(child, callback); // Otherwise recurse into its children
+    });
+  }
 }
 
 // Replaces all instances of ' -> ’ and "word" -> “word”
@@ -71,8 +88,7 @@ function escapeQuotes(string) {
   return string
     .replace(/'/gm, "’")
     .replace(/(\s)"/gm, "$1“")
-    .replace(/"(\s)/gm, "”$1")
-    .replace(/"/gm, "“");
+    .replace(/"(\s)/gm, "”$1");
 }
 
 // Extracts translation values from a CSS matrix string

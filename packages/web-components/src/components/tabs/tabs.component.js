@@ -1,7 +1,7 @@
 import { c, useEffect, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { cssJoin } from "../../lib/array";
-import { renderHtml } from "../../lib/dom";
+import { renderHtml, sanitizeTextContent } from "../../lib/dom";
 import styles from "./tabs.scss";
 
 function Tabs({
@@ -49,6 +49,7 @@ function Tabs({
     const contents = items.map((el, index) => {
       const title = el.getAttribute("title") || "Missing title";
       const visible = index === activeTab;
+      sanitizeTextContent(el);
       return (
         <div
           id={`${title}-tab`}
