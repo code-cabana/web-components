@@ -88,7 +88,8 @@ function escapeQuotes(string) {
   return string
     .replace(/'/gm, "’")
     .replace(/(\s)"/gm, "$1“")
-    .replace(/"(\s)/gm, "”$1");
+    .replace(/"(\s)/gm, "”$1")
+    .replace(/"/gm, "”");
 }
 
 // Extracts translation values from a CSS matrix string
