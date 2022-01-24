@@ -35,3 +35,5 @@ Version is incremented [semantically](https://semver.org/) using the [convention
 
 - Add `npm install` support in addition to unpkg script tag reference
 - Fix accordion issue when used with react and switching between presets - tries to remove child elements but they have been imperatively modified by the accordion
+- Typewriter
+- Image hover
