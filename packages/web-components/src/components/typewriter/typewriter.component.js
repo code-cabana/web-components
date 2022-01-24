@@ -1,4 +1,4 @@
-import { c, useEffect, useRef, useState } from "atomico";
+import { c, render, useEffect, useRef, useState } from "atomico";
 import { useSlot } from "@atomico/hooks/use-slot";
 import { cssJoin } from "../../lib/array";
 import styles from "./typewriter.scss";
@@ -21,9 +21,10 @@ function Typewriter({
   const [messages, setMessages] = useState([]);
   const [messageIndex, setMessageIndex] = useState(0);
   const [cursorPos, setCursorPos] = useState(0);
-  const [ticks, setTicks] = useState(0);
   const [direction, setDirection] = useState(1);
   const [paused, setPaused] = useState(false);
+  const [ticks, setTicks] = useState(0);
+  const maxTicks = 10;
 
   const {
     text: messageText,
@@ -43,7 +44,8 @@ function Typewriter({
     direction === 1
       ? parseInt(messagePause) || _pause
       : parseInt(messageBackspacePause) || _backspacePause;
-  const renderedMessage = messageText && messageText.substring(0, cursorPos);
+  const substring = messageText && messageText.substring(0, cursorPos);
+  const renderedMessage = substring && substring.length > 0 && substring;
   const characterDuration = constantSpeed
     ? duration
     : messageText && duration / messageText.length;
@@ -64,7 +66,10 @@ function Typewriter({
 
   function initAnimation() {
     const animIntervalRef = setInterval(() => {
-      setTicks((prevTicks) => prevTicks + 1);
+      setTicks((prevTicks) => {
+        const newTicks = prevTicks + 1;
+        return newTicks > maxTicks ? 0 : newTicks;
+      });
     }, characterDuration);
     return () => clearInterval(animIntervalRef);
   }
@@ -117,7 +122,7 @@ function Typewriter({
     >
       <slot ref={slotRef} />
       <p class="message" part="message">
-        {renderedMessage}
+        {renderedMessage || <br />}
         <div class={cssJoin(["cursor", cursorStyle])} part="cursor">
           {cursor}
         </div>
