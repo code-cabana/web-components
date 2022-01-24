@@ -1,0 +1,78 @@
+::slotted(*) {
+  display: none;
+}
+
+.message {
+  position: relative;
+}
+
+.cursor {
+  display: inline-block;
+  animation: var(--cursor-blink-anim, soft) var(--cursor-blink-speed, 1s) linear
+    infinite;
+  color: var(--cursor-color, black);
+}
+
+.vertical-bar {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.1em;
+  height: 1em;
+  background: var(--cursor-color, black);
+  margin-left: 0.1em;
+}
+
+.i-beam {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0.05em;
+  height: 1em;
+  background: var(--cursor-color, black);
+  margin-left: 0.2em;
+  margin-top: 0.05em;
+}
+
+.i-beam::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.4em;
+  height: 0.025em;
+  background: var(--cursor-color, black);
+}
+
+.i-beam::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0.4em;
+  height: 0.025em;
+  background: var(--cursor-color, black);
+}
+
+@keyframes soft {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes hard {
+  0% {
+    opacity: 1;
+  }
+  49% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
