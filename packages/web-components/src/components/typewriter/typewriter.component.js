@@ -122,7 +122,7 @@ function Typewriter({
     >
       <slot ref={slotRef} />
       <p class="message" part="message">
-        {renderedMessage || (!cursor && <br />)}
+        {renderedMessage || (!cursor && <>&#8203;</>)}
         <div class={cssJoin(["cursor", cursorStyle])} part="cursor">
           {cursor}
         </div>
