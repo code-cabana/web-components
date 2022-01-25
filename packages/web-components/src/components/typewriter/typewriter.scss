@@ -15,8 +15,6 @@
 
 .vertical-bar {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   width: 0.1em;
   height: 1em;
   background: var(--cursor-color, black);
@@ -25,8 +23,6 @@
 
 .i-beam {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   width: 0.05em;
   height: 1em;
   background: var(--cursor-color, black);
