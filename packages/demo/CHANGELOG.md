@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.51](https://github.com/code-cabana/web-components/compare/v0.0.50...v0.0.51) (2022-01-25)
+
+**Note:** Version bump only for package demo
+
+
+
+
+
 ## [0.0.50](https://github.com/code-cabana/web-components/compare/v0.0.49...v0.0.50) (2022-01-24)
 
 **Note:** Version bump only for package demo
