@@ -1,0 +1,89 @@
+$position: var(--position, 0px);
+
+.viewport {
+  position: relative;
+  width: var(--width, 100%);
+  height: var(--height, 100%);
+  overflow: hidden;
+
+  &.swipeable {
+    cursor: grab;
+  }
+}
+
+.track {
+  display: inline-grid;
+  grid-auto-flow: column;
+  transform: translateX($position);
+  transition: transform var(--duration, 0.3s) var(--easing, ease-out);
+}
+
+.track *[slot="slide"],
+::slotted(*),
+.item {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  width: var(--itemWidth);
+  height: var(--height);
+  object-fit: cover;
+  border: 1px solid black;
+}
+
+slot {
+  display: none;
+}
+
+.navigators {
+  display: inline-grid;
+  grid-auto-flow: column;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 1%;
+  pointer-events: none;
+  z-index: 2;
+
+  button {
+    cursor: pointer;
+    pointer-events: all;
+    background-color: transparent;
+    border: none;
+
+    width: 15vw;
+    $minWidth: 64px;
+    $maxWidth: 96px;
+    min-width: $minWidth;
+    max-width: $maxWidth;
+    padding: 16px;
+    transition: width 0.1s, max-width 0.1s;
+
+    img {
+      max-width: 100%;
+    }
+
+    &.disabled {
+      width: calc(#{$maxWidth} / 1.25);
+      opacity: 0.5;
+      cursor: auto;
+    }
+
+    &.enlarge:hover:not(.disabled) {
+      $enlargedWidth: calc(#{$maxWidth} * 1.15);
+      width: $enlargedWidth;
+      max-width: $enlargedWidth;
+    }
+
+    &.next {
+      justify-self: end;
+    }
+  }
+}
+
+.flip {
+  transform: rotate(180deg);
+}

@@ -1,0 +1,39 @@
+{
+  "name": "@codecabana/web-components",
+  "version": "0.0.52",
+  "author": "code-cabana",
+  "license": "MIT",
+  "description": "Web components designed to infiltrate no-code platforms via script tags",
+  "homepage": "https://codecabana.com.au",
+  "main": "index.js",
+  "scripts": {
+    "dev": "",
+    "build": "tsup --config ci/tsup.config.js",
+    "test": "run-s size",
+    "size": "bundlewatch --config ci/bundlewatch.config.json",
+    "clean": "shx rm -rf dist",
+    "prepare": "run-s clean build test"
+  },
+  "devDependencies": {
+    "@atomico/hooks": "^3.36.0",
+    "bundlewatch": "^0.3.3",
+    "cross-env": "^7.0.3",
+    "esbuild": "^0.14.38",
+    "esbuild-sass-plugin": "^2.2.6",
+    "npm-run-all": "^4.1.5",
+    "sass": "^1.51.0",
+    "shx": "^0.3.4",
+    "tsup": "^5.12.6"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/code-cabana/web-components.git"
+  }
+}
