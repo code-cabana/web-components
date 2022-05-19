@@ -1,6 +1,8 @@
-import { defineConfig } from "tsup";
+import { defineConfig, Options } from "tsup";
 
-export default defineConfig((options) => ({
+type Flags = { prod?: boolean };
+
+export default defineConfig((options: Options & Flags) => ({
   entry: ["src/components/hello/hello.tsx"],
   splitting: false,
   sourcemap: true,

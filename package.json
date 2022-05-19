@@ -8,7 +8,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "",
-    "build": "tsup --config ci/tsup.config.js",
+    "build": "tsup --config ci/tsup.config.ts",
     "test": "run-s size",
     "size": "bundlewatch --config ci/bundlewatch.config.json",
     "clean": "shx rm -rf dist",
