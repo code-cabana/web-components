@@ -1,0 +1,9 @@
+{
+  "name": "static",
+  "scripts": {
+    "dev": "node bs.config.js"
+  },
+  "devDependencies": {
+    "browser-sync": "^2.27.10"
+  }
+}

@@ -1,7 +1,7 @@
 {
   "files": [
     {
-      "path": "../dist/**/*.js",
+      "path": "dist/*/index.js",
       "maxSize": "20kB",
       "compression": "none"
     }
