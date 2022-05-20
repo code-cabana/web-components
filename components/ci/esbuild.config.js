@@ -15,14 +15,14 @@ module.exports = ({ browser: _browser, esm: _esm, common: _common }) => {
     outdir: "./dist/browser",
     target: ["chrome89", "firefox91", "safari15", "ios15"],
     entryNames: "[dir]/index",
-    plugins: [pluginsJsxRuntime({})],
+    plugins: [pluginsJsxRuntime()],
     ...common,
     ..._browser,
   };
 
   const esm = {
     entryPoints: ["src/components/index.tsx"],
-    outdir: "./dist/module",
+    outdir: "./dist/esm",
     format: "esm",
     target: ["esnext"],
     ...common,

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "preserveWatchOutput": true,
+    "outDir": "dist/types",
+    "emitDeclarationOnly": true,
+    "declaration": true,
+    "jsx": "preserve"
+  }
+}
