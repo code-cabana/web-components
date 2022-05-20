@@ -1,7 +1,7 @@
-const { build } = require("esbuild");
-const baseConfig = require("./esbuild.config.js");
+const build = require("./esbuild.config.js");
 
 build({
-  ...baseConfig,
-  minify: true,
-}).catch(() => process.exit(1));
+  common: {
+    minify: true,
+  },
+});

@@ -1,12 +1,4 @@
-import { c, Host } from "atomico";
+import { asWebComponent } from "../../lib/asWC";
 import { Hello2 } from "./index";
 
-function Hello2WebComponent(): Host<{}> {
-  return (
-    <host shadowDom>
-      <Hello2 />
-    </host>
-  );
-}
-
-customElements.define("codecabana-hello2", c(Hello2WebComponent));
+asWebComponent({ name: "hello2", component: Hello2 });

@@ -3,6 +3,9 @@
   "scripts": {
     "dev": "node bs.config.js"
   },
+  "dependencies": {
+    "@codecabana/web-components": "*"
+  },
   "devDependencies": {
     "browser-sync": "^2.27.10"
   }
