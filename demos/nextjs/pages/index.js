@@ -1,4 +1,4 @@
-import { Hello, Hello2 } from "@codecabana/web-components/src";
+import { Hello, Hello2 } from "@codecabana/web-components";
 
 export default function Home() {
   return (

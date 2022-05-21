@@ -1,7 +1,15 @@
 {
   "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "jsx": "preserve",
+    "lib": ["dom", "es2015", "es2016", "es2017.object"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "outDir": "./dist/esm",
     "preserveWatchOutput": true,
-    "jsx": "preserve"
+    "target": "es5"
   },
+  "files": ["./src/components/index.tsx"],
   "exclude": ["node_modules", "dist"]
 }

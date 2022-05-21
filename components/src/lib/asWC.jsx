@@ -9,12 +9,12 @@ export function asWebComponent({
   function webComponent() {
     return (
       <host shadowDom {...hostProps}>
-        {component()}
+        {component({})}
       </host>
     );
   }
 
-  asWebComponent.props = props;
+  webComponent.props = props;
 
   customElements.define(`codecabana-${name}`, c(webComponent));
 }

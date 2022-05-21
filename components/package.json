@@ -5,19 +5,23 @@
   "license": "MIT",
   "description": "Web components designed to infiltrate no-code platforms via script tags",
   "homepage": "https://codecabana.com.au",
-  "main": "./dist/esm/index.js",
-  "types": "./dist/types/index.d.ts",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
-    ".": "./dist/esm/index.js",
-    "./src": "./src/components/index.tsx"
+    ".": "./dist/esm/index.jsx",
+    "./types": "./dist/esm/index.d.ts"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "dev": "tsc --watch",
+    "dev": "run-p dev_tsc dev_esbuild",
+    "dev_tsc": "npm run build_tsc -- --watch",
+    "dev_esbuild": "node ./ci/esbuild.dev.js",
     "build": "run-s build_*",
-    "build_esm": "tsc --project ./ci/tsconfig.esm.json",
-    "build_browser": "tsc --project ./ci/tsconfig.browser.json",
-    "test": "run-s size",
-    "size": "bundlewatch --config ci/bundlewatch.config.json"
+    "build_tsc": "tsc",
+    "build_esbuild": "node ./ci/esbuild.prod.js",
+    "test": "run-s test_*",
+    "test_size": "bundlewatch --config ci/bundlewatch.config.json"
   },
   "devDependencies": {
     "@atomico/hooks": "^3.36.0",
