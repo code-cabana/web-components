@@ -2,6 +2,7 @@
   This file builds liquid ./ci/templates into ./index.html and ./components/*.html
   Using the filesystem to generate a list of the current components
 */
+import snippets from "../templates/snippets";
 import { Liquid } from "liquidjs";
 import glob from "fast-glob";
 import path from "path";
@@ -9,9 +10,9 @@ import fs from "fs";
 
 const cwd = path.resolve(__dirname);
 const components = getComponentList();
-const comment = "<!-- GENERATED FROM ./ci/templates -->";
+const comment = "<!-- GENERATED FROM ./demos/static/templates -->";
 const engine = new Liquid({
-  root: `${cwd}/templates`,
+  root: `${cwd}/../templates`,
   extname: ".liquid",
 });
 
@@ -29,12 +30,17 @@ function renderIndexPage() {
 }
 
 function renderComponentPages() {
-  components.forEach((component) => {
+  components.forEach((name) => {
+    const component = {
+      name,
+      snippet: snippets[name] || snippets["default"](name),
+    };
+
     engine
       .renderFile("component", { component })
       .then((content) =>
         writeToFile(
-          `${cwd}/../components/${component}.html`,
+          `${cwd}/../components/${name}.html`,
           `${comment}\n${content}`
         )
       );
