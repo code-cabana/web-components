@@ -1,3 +1,4 @@
+// This file starts the browser-sync server
 const bs = require("browser-sync").create();
 
 bs.init({

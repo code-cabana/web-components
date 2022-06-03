@@ -30,7 +30,6 @@
     "atomico": "^1.59.0",
     "bundlewatch": "^0.3.3",
     "esbuild": "^0.14.39",
-    "fast-glob": "^3.2.11",
     "sass": "^1.51.0",
     "typedoc": "^0.22.15"
   },
