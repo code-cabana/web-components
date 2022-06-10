@@ -1,9 +1,10 @@
 /*
   Vite plugin
-  Refresh the page if anything in public directory changes
+  Refresh the page if any public/web-components/dist/browser
+  files change
   
-  Needed to watch changes to webcomponents/dist js files
-  imported via script tags
+  These files are imported via inline script tags, so vite 
+  doesn't know about them
   
   https://vitejs.dev/guide/api-plugin.html#handlehotupdate
 */
