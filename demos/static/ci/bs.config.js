@@ -3,7 +3,7 @@ const bs = require("browser-sync").create();
 
 bs.init({
   server: {
-    baseDir: "../../",
+    baseDir: "out",
     directory: false,
     routes: {
       "/": "../../demos/static",

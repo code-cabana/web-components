@@ -1,13 +1,28 @@
-<!-- GENERATED FROM ./demos/static/templates -->
-<html>
+<h2>Testimonials2</h2>
 
-<head>
-  <script src="/@codecabana/web-components/dist/browser/carousel/index.js"></script>
-</head>
-
-<body>
-  <h1>carousel</h1>
-  <codecabana-carousel woo="hoo"></codecabana-carousel>
-</body>
-
-</html>
+<codecabana-carousel items-per-viewport="1" autoplay="false" enlarge-nav="false">
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">I am completely blown away</p>
+      <span part="author">Buzz Lightyear</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">Completely surpassed my expectations</p>
+      <span part="author">Bruce Wayne</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">It's exactly what I've been looking for</p>
+      <span part="author">Legolas</span>
+    </div>
+  </div>
+  <div slot="item">
+    <div part="testimonial">
+      <p part="quote">Dude, your stuff is the bomb!</p>
+      <span part="author">Mr. T</span>
+    </div>
+  </div>
+</codecabana-carousel>
