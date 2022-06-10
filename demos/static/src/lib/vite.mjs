@@ -12,7 +12,7 @@ export function watchPublic() {
   const pathMatch =
     "web-components/demos/static/public/web-components/dist/browser/";
   return {
-    name: "custom-hmr",
+    name: "watch-public",
     enforce: "post",
     handleHotUpdate({ file, server }) {
       if (file.includes(pathMatch)) {
