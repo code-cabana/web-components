@@ -1,0 +1,17 @@
+---
+import { getComponentList } from "../lib";
+const components = getComponentList();
+---
+
+<html>
+  <body>
+    <h1>Static</h1>
+    <ul>
+      {components.map(component => (
+        <li>
+          <a href={`/components/${component}`}>{component}</a>
+        </li>
+      ))}
+    </ul>
+  </body>
+</html>

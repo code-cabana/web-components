@@ -1,17 +1,15 @@
 {
   "name": "static",
   "scripts": {
-    "dev": "esr ./ci/dev.js",
-    "build": "esr ./ci/build.js",
-    "serve": "node ./ci/bs.config.js"
+    "dev": "astro dev",
+    "build": "astro build",
+    "serve": "astro preview"
   },
   "dependencies": {
     "@codecabana/web-components": "*"
   },
   "devDependencies": {
-    "browser-sync": "^2.27.10",
-    "esbuild-runner": "^2.2.1",
-    "liquidjs": "^9.37.0",
-    "watch": "^1.0.2"
+    "astro": "^1.0.0-beta.42",
+    "fast-glob": "^3.2.11"
   }
 }
