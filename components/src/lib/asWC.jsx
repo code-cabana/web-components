@@ -5,11 +5,13 @@ export function asWebComponent({
   component,
   props = {},
   hostProps = {},
+  styles,
 }) {
   function webComponent() {
     return (
       <host shadowDom {...hostProps}>
         {component({})}
+        {styles && <style>{styles}</style>}
       </host>
     );
   }
