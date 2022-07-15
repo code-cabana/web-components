@@ -2,11 +2,13 @@
   "name": "root",
   "workspaces": [
     "components",
-    "demos/*"
+    "demos/*",
+    "site"
   ],
   "scripts": {
-    "dev": "run-p \"wc -- dev\" \"static -- dev\" \"nextjs -- dev\"",
+    "dev": "run-p \"wc -- dev\" \"site -- dev\"",
     "wc": "npm run -w components --",
+    "site": "npm run -w site --",
     "static": "npm run -w static --",
     "nextjs": "npm run -w nextjs --",
     "format": "prettier -w .",
